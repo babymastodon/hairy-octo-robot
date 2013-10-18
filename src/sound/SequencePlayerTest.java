@@ -142,22 +142,28 @@ public class SequencePlayerTest extends TestCase {
 					System.out.println(text);
 				}
 			};
-			player = new SequencePlayer(100, 8, listener);
+			player = new SequencePlayer(100, 2, listener);
 
 			// rest 4
 			player.addNote(new Pitch('D').toMidiNote(), 4, 2);
 			player.addLyricEvent("A-", 4);
 			player.addNote(new Pitch('G').toMidiNote(), 6, 4);
 			player.addLyricEvent("ma-", 6);
-			player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(), 10,
-					1);
+			// player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(),
+			// 10,
+			// 1);
+			player.addNote(new Pitch('B').toMidiNote(), 10, 1);
 			player.addNote(new Pitch('G').toMidiNote(), 11, 1);
 			player.addLyricEvent("zing", 10);
-			player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(), 12,
-					4);
+			// player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(),
+			// 12,
+			// 4);
+			player.addNote(new Pitch('B').toMidiNote(), 12, 4);
 			player.addLyricEvent("grace!", 12);
-			player.addNote(new Pitch('A').octaveTranspose(1).toMidiNote(), 16,
-					2);
+			// player.addNote(new Pitch('A').octaveTranspose(1).toMidiNote(),
+			// 16,
+			// 2);
+			player.addNote(new Pitch('A').toMidiNote(), 16, 2);
 			player.addLyricEvent("How", 16);
 			player.addNote(new Pitch('G').toMidiNote(), 18, 4);
 			player.addLyricEvent("sweet", 18);
@@ -169,21 +175,16 @@ public class SequencePlayerTest extends TestCase {
 			player.addLyricEvent("That", 28);
 			player.addNote(new Pitch('G').toMidiNote(), 30, 4);
 			player.addLyricEvent("saved", 30);
-			player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(), 34,
-					1);
+			player.addNote(new Pitch('B').toMidiNote(), 34, 1);
 			player.addNote(new Pitch('G').toMidiNote(), 35, 1);
 			player.addLyricEvent("a", 34);
-			player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(), 36,
-					4);
+			player.addNote(new Pitch('B').toMidiNote(), 36, 4);
 			player.addLyricEvent("wretch", 36);
-			player.addNote(new Pitch('A').octaveTranspose(1).toMidiNote(), 40,
-					2);
+			player.addNote(new Pitch('A').toMidiNote(), 40, 2);
 			player.addLyricEvent("like", 40);
 			player.addNote(new Pitch('D').octaveTranspose(1).toMidiNote(), 42,
-					6);
+					8);
 			player.addLyricEvent("me.", 42);
-			player.addNote(new Pitch('D').octaveTranspose(1).toMidiNote(), 48,
-					2);
 			player.play();
 		} catch (MidiUnavailableException e) {
 			e.printStackTrace();
