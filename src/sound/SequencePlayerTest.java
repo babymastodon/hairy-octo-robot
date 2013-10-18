@@ -149,20 +149,11 @@ public class SequencePlayerTest extends TestCase {
 			player.addLyricEvent("A-", 4);
 			player.addNote(new Pitch('G').toMidiNote(), 6, 4);
 			player.addLyricEvent("ma-", 6);
-			// player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(),
-			// 10,
-			// 1);
 			player.addNote(new Pitch('B').toMidiNote(), 10, 1);
 			player.addNote(new Pitch('G').toMidiNote(), 11, 1);
 			player.addLyricEvent("zing", 10);
-			// player.addNote(new Pitch('B').octaveTranspose(1).toMidiNote(),
-			// 12,
-			// 4);
 			player.addNote(new Pitch('B').toMidiNote(), 12, 4);
 			player.addLyricEvent("grace!", 12);
-			// player.addNote(new Pitch('A').octaveTranspose(1).toMidiNote(),
-			// 16,
-			// 2);
 			player.addNote(new Pitch('A').toMidiNote(), 16, 2);
 			player.addLyricEvent("How", 16);
 			player.addNote(new Pitch('G').toMidiNote(), 18, 4);
