@@ -7,7 +7,6 @@ package sound;
  *
  * Rep Invariant:
  *   
- *   Accidental is in {SHARP, DOUBLE_SHARP, FLAT, DOUBLE_FLAT, NATURAL}.
  *   0 <= toMidiNote() <= 127
  *
  * The zeroeth octave is starts at middle C and
@@ -81,7 +80,6 @@ public class Pitch {
     }
 
     private void checkRep(){
-        assert accidental != Accidental.NONE;
         assert 0 <= toMidiNote();
         assert toMidiNote() <= 127;
     }

@@ -1,7 +1,7 @@
 package sound;
 
 public enum Accidental {
-    SHARP(1), FLAT(-1), DOUBLE_SHARP(2), DOUBLE_FLAT(-2), NATURAL(0), NONE(100);
+    SHARP(1), FLAT(-1), DOUBLE_SHARP(2), DOUBLE_FLAT(-2), NATURAL(0), NONE(0);
 
     private int value;
 
