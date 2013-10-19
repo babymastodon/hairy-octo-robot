@@ -1,0 +1,32 @@
+package sound;
+
+public enum Letter {
+    A(9), B(11), C(0), D(2), E(4), F(5), G(7);
+
+    private int value;
+
+    private Letter(int value) {
+        this.value = value;
+    }
+
+    /**
+     * TODO: write doc
+     */
+    public static Letter fromChar(char c) {
+        switch (c){
+            case 'a': case 'A': return A;
+            case 'b': case 'B': return B;
+            case 'c': case 'C': return C;
+            case 'd': case 'D': return D;
+            case 'e': case 'E': return E;
+            case 'f': case 'F': return F;
+            case 'g': case 'G': return G;
+        }
+        throw new RuntimeException("Note character must be in the range A-G: " + c);
+    }
+
+    public int getValue(){
+        return value;
+    }
+
+}
