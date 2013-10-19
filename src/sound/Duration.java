@@ -70,4 +70,21 @@ public class Duration {
         }
     }
 
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj.getClass() != this.getClass())
+            return false;
+        Duration that = (Duration) obj;
+        return this.numerator == that.numerator &&
+            this.denominator == that.denominator;
+    }
+
+    @Override
+    public int hashCode() {
+        return numerator * 1253 + denominator * 91;
+    }
+
 }
