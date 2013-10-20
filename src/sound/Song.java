@@ -51,15 +51,13 @@ public class Song {
         
         while(iteratorOfKeys.hasNext()){
             Voice voiceKey = iteratorOfKeys.next();
-            List<Bar> correspondingBarList = new ArrayList<Bar>();
-            
-            Collections.copy(correspondingBarList, barLists.get(voiceKey));
+            List<Bar> correspondingBarList;
+           
+            correspondingBarList = (ArrayList<Bar>) ((ArrayList<Bar>)barLists.get(voiceKey)).clone();
             
             this.barLists.put(voiceKey, correspondingBarList);
-            iteratorOfKeys.remove();
         }
         
-    
         this.index = index;
         this.title = title;
         this.composer = composer;
@@ -70,11 +68,10 @@ public class Song {
         this.beatDuration = beatDuration;
         this.beatsPerMinute = beatsPerMinute;
         
-        
         checkRep();
- 
         
     }
+    
     
     /**
      * Returns the index of the Song.
@@ -218,7 +215,7 @@ public class Song {
                 this.keySignature.equals(that.keySignature) &&
                 this.beatDuration.equals(that.beatDuration) &&
                 this.beatsPerMinute == that.beatsPerMinute &&
-                deepEqualsMap(this.barLists, that.barLists));
+                this.barLists.equals(that.barLists));
     }
 
 
@@ -236,43 +233,6 @@ public class Song {
         assert meterNumerator > 0;
         assert meterDenominator > 0;
         assert beatsPerMinute > 0;
-    }
-    
-    
-    private boolean deepEqualsMap(Map<Voice,List<Bar>> firstMap, Map<Voice,List<Bar>> secondMap){
-        Set<Voice> firstKeySet = firstMap.keySet();
-        Set<Voice> secondKeySet = secondMap.keySet();
-        
-        if(firstMap.size() != secondMap.size()){
-            return false;
-        }
-        
-        if(!firstKeySet.equals(secondKeySet)){
-            return false;
-        }
-        
-        Iterator<Voice> iteratorOfKeys = firstKeySet.iterator();
-        
-        while(iteratorOfKeys.hasNext()){
-            Voice voiceKey = iteratorOfKeys.next();
-            
-            List<Bar> firstList = firstMap.get(voiceKey);
-            List<Bar> secondList = secondMap.get(voiceKey);
-            
-            if(firstList.size() != secondList.size()){
-                return false;
-            }
-            
-            for(int i=0; i<firstList.size(); i++){
-                if(!((firstList.get(i)).equals(secondList.get(i)))){
-                    return false;
-                }
-            }
-            
-            iteratorOfKeys.remove();
-        }
-        
-        return true;
     }
 
 }
