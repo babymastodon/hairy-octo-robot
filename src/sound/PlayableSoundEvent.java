@@ -18,11 +18,13 @@ public class PlayableSoundEvent {
     
     
     /**
+     * Constructs a new PlayableSoundEvent object given a Sound,
+     * number of ticks, and Lyric.
      * 
      * @param sound a Sound object
      * @param ticks the number of ticks the sound should be played for. Requires
      *        ticks > 0.
-     * @param lyric a lyric that corresponds with the sound
+     * @param lyric a Lyric that corresponds with the sound
      */
     public PlayableSoundEvent(Sound sound, int ticks, Lyric lyric){
         this.sound = sound;
@@ -35,8 +37,10 @@ public class PlayableSoundEvent {
     
     
     /**
+     * Constructs a new PlayableSoundEvent object given a Sound, and
+     * number of ticks.
      * 
-     * @param sound the sound object
+     * @param sound the Sound of the object
      * @param ticks the number of ticks the sound should be played for. Requires
      *        ticks > 0.
      */
@@ -52,10 +56,10 @@ public class PlayableSoundEvent {
     
     
     /**
-     * Returns whether or not the object was constructed
-     * with a Lyric.
+     * Returns whether or not the object has a corresponding Lyric (i.e. was constructed
+     * with a Lyric).
      * 
-     * @return true if the object was constructed with a Lyric. False otherwise.
+     * @return true if the object has a Lyric. False otherwise.
      */
     public boolean hasLyric(){
         return hasLyric;
@@ -90,7 +94,7 @@ public class PlayableSoundEvent {
     /**
      * Returns the ticks of the object.
      * 
-     * @return the number of ticks the object should be played for
+     * @return the number of ticks the Sound of the object should be played for
      */
     public int getTicks(){
         return ticks;
