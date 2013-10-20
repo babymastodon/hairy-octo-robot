@@ -99,6 +99,32 @@ public class PlayableSoundEvent {
     public int getTicks(){
         return ticks;
     }
+
+
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null){
+            return false;
+        }
+        
+        if (obj.getClass() != this.getClass()){
+            return false;
+        }
+        
+        PlayableSoundEvent that = (PlayableSoundEvent) obj;
+        
+        return (this.sound.equals(that.sound) && this.ticks == that.ticks
+                && this.hasLyric() == that.hasLyric() && 
+                this.lyric.equals(that.lyric));
+    }
+
+    
+    
+    @Override
+    public int hashCode() {
+        return sound.hashCode() + lyric.hashCode() + ticks;
+    }
     
     
     private void checkRep(){
