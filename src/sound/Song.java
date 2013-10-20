@@ -51,12 +51,11 @@ public class Song {
         
         while(iteratorOfKeys.hasNext()){
             Voice voiceKey = iteratorOfKeys.next();
-            List<Bar> correspondingBarList = new ArrayList<Bar>();
-            
-            Collections.copy(correspondingBarList, barLists.get(voiceKey));
+            List<Bar> correspondingBarList;
+           
+            correspondingBarList = (ArrayList<Bar>) ((ArrayList<Bar>)barLists.get(voiceKey)).clone();
             
             this.barLists.put(voiceKey, correspondingBarList);
-            iteratorOfKeys.remove();
         }
         
     
