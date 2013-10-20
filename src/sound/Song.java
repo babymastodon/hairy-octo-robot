@@ -197,11 +197,82 @@ public class Song {
     }
     
     
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null){
+            return false;
+        }
+        
+        if (obj.getClass() != this.getClass()){
+            return false;
+        }
+        
+        Song that = (Song) obj;
+        
+        return (this.index == that.index && this.title.equals(that.title)
+                && this.composer.equals(that.composer) && 
+                this.meterNumerator == that.meterNumerator &&
+                this.meterDenominator == that.meterDenominator &&
+                this.defaultDuration.equals(that.defaultDuration) &&
+                this.keySignature.equals(that.keySignature) &&
+                this.beatDuration.equals(that.beatDuration) &&
+                this.beatsPerMinute == that.beatsPerMinute &&
+                deepEqualsMap(this.barLists, that.barLists));
+    }
+
+
+    
+    
+    @Override
+    public int hashCode() {
+        return (index + composer.hashCode() + meterNumerator + meterDenominator
+                + defaultDuration.hashCode() + keySignature.hashCode() +
+                beatDuration.hashCode() + beatsPerMinute + barLists.hashCode());
+    }
+    
+    
     private void checkRep(){
         assert meterNumerator > 0;
         assert meterDenominator > 0;
         assert beatsPerMinute > 0;
     }
     
+    
+    private boolean deepEqualsMap(Map<Voice,List<Bar>> firstMap, Map<Voice,List<Bar>> secondMap){
+        Set<Voice> firstKeySet = firstMap.keySet();
+        Set<Voice> secondKeySet = secondMap.keySet();
+        
+        if(firstMap.size() != secondMap.size()){
+            return false;
+        }
+        
+        if(!firstKeySet.equals(secondKeySet)){
+            return false;
+        }
+        
+        Iterator<Voice> iteratorOfKeys = firstKeySet.iterator();
+        
+        while(iteratorOfKeys.hasNext()){
+            Voice voiceKey = iteratorOfKeys.next();
+            
+            List<Bar> firstList = firstMap.get(voiceKey);
+            List<Bar> secondList = secondMap.get(voiceKey);
+            
+            if(firstList.size() != secondList.size()){
+                return false;
+            }
+            
+            for(int i=0; i<firstList.size(); i++){
+                if(!((firstList.get(i)).equals(secondList.get(i)))){
+                    return false;
+                }
+            }
+            
+            iteratorOfKeys.remove();
+        }
+        
+        return true;
+    }
 
 }
