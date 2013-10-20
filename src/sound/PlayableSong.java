@@ -8,7 +8,7 @@ public class PlayableSong {
      * ticksPerBeat > 0
      */
     
-    private final ArrayList<PlayableSoundEvent> events;
+    private final List<PlayableSoundEvent> events;
     private final int beatsPerMinute;
     private final int ticksPerBeat;
     
