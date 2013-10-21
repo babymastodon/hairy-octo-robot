@@ -62,7 +62,7 @@ LINEFEED: ('\n')+;
 abctune : abcheader abcmusic EOF;
 abcheader : fieldnumber comment* fieldtitle otherfields* fieldkey;
 fieldnumber : 'X:' (' '+ | DIGIT)+ endofline;
-fieldtitle : 'T:' fieldtitletext endofline;
+fieldtitle : 'T:' ' '* fieldtitletext ' '* endofline;
 fieldtitletext : (' '+ | text | DIGIT | (space* DIGIT space*))+;
 otherfields : fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice | comment;
 fieldcomposer : 'C:' ' '* composername ' '* endofline;
