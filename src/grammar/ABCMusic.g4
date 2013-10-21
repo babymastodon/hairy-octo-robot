@@ -78,7 +78,7 @@ keyaccidental : '#' | 'b';
 modeminor : 'm';
 meter : 'C' | 'C|' | meterfraction;
 meterfraction : DIGIT+ '/' DIGIT+;
-tempo : (meterfraction '=')* DIGIT+;
+tempo : meterfraction '=' DIGIT+;
 abcmusic : abcline+;
 abcline : element+ LINEFEED (lyric LINEFEED*)* | midtunefield | comment;
 //abcline : element+ LINEFEED | midtunefield | comment;
