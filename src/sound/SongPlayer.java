@@ -37,7 +37,7 @@ public class SongPlayer {
                     List<Pitch> pitchList = sound.getPitches();
                     
                     for(Pitch pitchOfSound : pitchList){
-                        player.addNote(new Pitch(pitchOfSound.getLetter()).toMidiNote(),startTick,soundEvent.getTicks());
+                        player.addNote(new Pitch(pitchOfSound.getLetter(),pitchOfSound.getOctave()).toMidiNote(),startTick,soundEvent.getTicks());
                         System.out.println("ST: " + startTick + "  TL: " + soundEvent.getTicks());
                     }
                     

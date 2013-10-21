@@ -9,7 +9,7 @@ import java.util.*;
 public class SongPlayerTest {
     
     public static void main(String[] args){
-
+        System.out.println(new Pitch(Letter.C, 1).toMidiNote());
      
         Note n1 = new Note(new Pitch(Letter.C,Accidental.NONE));
         SoundEvent sound1 = new SoundEvent(n1,new Duration(1,1));
@@ -61,16 +61,16 @@ public class SongPlayerTest {
         soundEvents2.add(sound10);
         
         
-        Note n11 = new Note(new Pitch(Letter.C,Accidental.NONE,1));
+        Note n11 = new Note(new Pitch(Letter.C,1));
         SoundEvent sound11 = new SoundEvent(n11,new Duration(1,3));
         
-        Note n12 = new Note(new Pitch(Letter.G,Accidental.NONE));
+        Note n12 = new Note(new Pitch(Letter.G));
         SoundEvent sound12 = new SoundEvent(n12,new Duration(1,3));
         
-        Note n13 = new Note(new Pitch(Letter.E,Accidental.NONE));
+        Note n13 = new Note(new Pitch(Letter.E));
         SoundEvent sound13 = new SoundEvent(n13,new Duration(1,3));
         
-        Note n14 = new Note(new Pitch(Letter.C,Accidental.NONE));
+        Note n14 = new Note(new Pitch(Letter.C));
         SoundEvent sound14 = new SoundEvent(n14,new Duration(1,3));
     
         
@@ -135,9 +135,8 @@ public class SongPlayerTest {
                    new Duration(1,4), 140);
         
         PlayableSong ps = new SongConverter(song).getResult();
-        System.out.println("Events: " + ps.getEvents().size());
         
-        System.out.println(ps.getTicksPerBeat());
+        System.out.println("Ticks per beat: " + ps.getTicksPerBeat());
         
         SongPlayer songPlayer = new SongPlayer(ps);
        
