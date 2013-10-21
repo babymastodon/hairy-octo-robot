@@ -109,7 +109,7 @@ public class SongConverter {
         List<Voice> voicesList = songAccidentals.listVoices();
         //TODO: handle multiple voices and lyrics
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
-        int ticksPerBeat = gcd / (songAccidentals.getBeatDuration().getDenominator()*songAccidentals.getBeatDuration().getNumerator());
+        int ticksPerBeat = gcd;
         
         Voice voice = voicesList.get(0);
         
@@ -122,7 +122,7 @@ public class SongConverter {
             
             for(SoundEvent soundEvent : soundEventsList){
                 Duration absoluteDuration = soundEvent.getDuration().mul(songAccidentals.getDefaultDuration());
-                int numTicks = (absoluteDuration.getNumerator()*gcd) / absoluteDuration.getDenominator();
+                int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
                 System.out.println("Numticks: " + numTicks);
                 playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
             }
