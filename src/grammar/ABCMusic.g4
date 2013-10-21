@@ -43,8 +43,10 @@ package grammar;
 /*
  * These are the lexical rules. They define the tokens used by the lexer.
  */
-PLUS     : '+';
-
+WHITESPACE : ('\t' | ' ')+ ;
+DIGIT: [0-9]+;
+WORD: [a-zA-Z!.?]+;
+LINEFEED: ('\n')+;
 
 /*
  * These are the parser rules. They define the structures used by the parser.
@@ -57,4 +59,56 @@ PLUS     : '+';
  * For more information, see
  * http://www.antlr.org/wiki/display/ANTLR4/Parser+Rules#ParserRules-StartRulesandEOF
  */
-line     : PLUS EOF;
+abctune : abcheader abcmusic EOF;
+abcheader : fieldnumber comment* fieldtitle otherfields* fieldkey;
+fieldnumber : 'X:' (' '+ | DIGIT)+ endofline;
+fieldtitle : 'T:' fieldtitletext endofline;
+fieldtitletext : (' '+ | text | DIGIT | (space* DIGIT space*))+;
+otherfields : fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice | comment;
+fieldcomposer : 'C:' composername endofline;
+composername: (' '+ | text)+;
+fielddefaultlength : 'L:' notelengthstrict endofline;
+fieldmeter : 'M:' meter endofline;
+fieldtempo : 'Q:' tempo endofline;
+fieldvoice : 'V:' text endofline;
+fieldkey : 'K:' key endofline;
+key : keynote (modeminor)*;
+keynote : basenote (keyaccidental)*;
+keyaccidental : '#' | 'b';
+modeminor : 'm';
+meter : 'C' | 'C|' | meterfraction;
+meterfraction : DIGIT+ '/' DIGIT+;
+tempo : (meterfraction '=')* DIGIT+;
+abcmusic : abcline+;
+abcline : element+ LINEFEED (lyric LINEFEED*)* | midtunefield | comment;
+//abcline : element+ LINEFEED | midtunefield | comment;
+element : noteelement | tupletelement | barline | nthrepeat | ' ' ;
+noteelement : note | multinote;
+// note is either a pitch or a rest;
+note : noteorrest notelength?;
+noteorrest : pitch | rest;
+pitch : accidental* basenote octave* ;
+octave : '\''+ | ','+;
+notelength : DIGIT* '/'? DIGIT*;
+notelengthstrict : DIGIT+ '/' DIGIT+;
+// '^' is sharp, '_' is flat, and '=' is neutral;
+accidental : '^' | '^^' | '_' | '__' | '=';
+basenote : 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B' | 'c' | 'd' | 'e' | 'f' | 'g' | 'a' | 'b';
+rest : 'z';
+// tuplets;
+tupletelement : tupletspec (noteelement+ | WORD);
+tupletspec : '(' DIGIT ;
+// chords;
+multinote : '[' note+ ']';
+barline : '|' | '||' | '[|' | '|]' | ':|' | '|:';
+nthrepeat : '[1' | '[2';
+// A voice field might reappear in the middle of a piece;
+// to indicate the change of a voice;
+midtunefield : fieldvoice;
+comment : '%' text LINEFEED;
+endofline : comment | LINEFEED;
+lyric : 'w:' lyrical_element*;
+lyrical_element : ' '+ | '-' | '_' | '*' | '~' | '\-' | '|' | lyric_text | basenote | rest;
+text : WHITESPACE* WORD WHITESPACE*;
+lyric_text : WHITESPACE* WORD WHITESPACE*;
+space: WHITESPACE;
