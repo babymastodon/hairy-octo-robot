@@ -9,6 +9,7 @@ import java.util.Map;
 public class Listener extends ABCMusicBaseListener {
 	// TODO: Construct map
 	// TODO: getSong() & set Duration objects to appropriate defaults before
+	// TODO: grammar breaks on "b" for flat in K: field.
 	// creating Song object
 	private Map<Voice, List<Bar>> barLists;
 	private int index; // req of abc files
@@ -158,18 +159,19 @@ public class Listener extends ABCMusicBaseListener {
 		SingleAccidental accidental = SingleAccidental.NATURAL;
 		boolean major = true;
 		// Accidental : SHARP(1), FLAT(-1), NATURAL(0)
+		System.out.println("ACCIDENTAL: "
+				+ ctx.key().keynote().keyaccidental().get(0).getText());
 		if (ctx.key().keynote().keyaccidental().size() != 0) {
-			if (ctx.key().keynote().keyaccidental().get(0).getText().hashCode() == "b"
-					.hashCode()) {
+			if (ctx.key().keynote().keyaccidental().get(0).getText()
+					.equals("b")) {
 				accidental = SingleAccidental.FLAT;
 			} else if (ctx.key().keynote().keyaccidental().get(0).getText()
-					.hashCode() == "#".hashCode()) {
+					.equals("#")) {
 				accidental = SingleAccidental.SHARP;
 			}
 		}
 		if (ctx.key().modeminor().size() != 0
-				&& ctx.key().modeminor().get(0).getText().hashCode() == "m"
-						.hashCode()) {
+				&& ctx.key().modeminor().get(0).getText().equals("m")) {
 			major = false;
 		}
 		KeySignature keySignature = new KeySignature(letter, accidental, major);
