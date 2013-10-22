@@ -14,74 +14,62 @@ public class SongConverter {
     
     private Song fillInAccidentals(){
         List<Voice> voicesList = song.listVoices();
-        
+
         //TODO: Handle multiple voices
-        
+
         Voice voice = voicesList.get(0);
         List<Bar> barsForVoice = song.getBars(voice);
-        
-        List<Bar> newBars = new ArrayList<Bar>();
-        
-        for(Bar bar : barsForVoice){
-           List<SoundEvent> soundEventsList = bar.getEvents();
-           Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
-           List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
-           
-           for(SoundEvent soundEventInBar : soundEventsList){
-               Sound sound = soundEventInBar.getSound();
-               
-               // we only need to alter the pitches of Notes and Chords 
-               if(sound.getClass() == Note.class || sound.getClass() == Chord.class){
-                   List<Pitch> pitchList = sound.getPitches();
-                   List<Pitch> newPitchList = new ArrayList<Pitch>();
-                   
-                   for(Pitch pitchOfNote : pitchList){
-                       Letter letter = pitchOfNote.getLetter();
-                       letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
-                       Accidental accidentalOfNote = pitchOfNote.getAccidental();
-                       
-                       // When there is no accidental on a note then the key signature
-                       // and previous accidentals on the same note earlier in the bar can be applied.
-                       // Anything that has an accidental does not get altered, instead its accidental is
-                       // stored in a map so it can be applied to later notes, in the same bar, of the same letter.
-                       if(accidentalOfNote == Accidental.NONE){
-                           Pitch newPitch = new Pitch(letter, letterToAccidental.get(letter), pitchOfNote.getOctave());
-                           newPitchList.add(newPitch);
-                       } else{
-                           letterToAccidental.put(letter, accidentalOfNote);
-                           newPitchList.add(pitchOfNote);
-                       }
-                   }
-                   
-                   // we have to make a new Note if there was only one pitch
-                   // we to make a chord otherwise because pitch list must be greater than one
-                   if(newPitchList.size() == 1){
-                       Note newNote = new Note(newPitchList.get(0));
-                       SoundEvent newSoundEvent = new SoundEvent(newNote, soundEventInBar.getDuration());
-                       newSoundEventsList.add(newSoundEvent);
-                   } else{
-                       Chord newChord = new Chord(newPitchList);
-                       SoundEvent newSoundEvent = new SoundEvent(newChord, soundEventInBar.getDuration());
-                       newSoundEventsList.add(newSoundEvent);
-                   }
-                   
-               }else{
-                   newSoundEventsList.add(soundEventInBar);
-               }
-              
-           }
 
-           Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getBeginRepeat(),bar.getEndRepeat(),bar.getRepeatEnding());
-           newBars.add(newBar);
-           
+        List<Bar> newBars = new ArrayList<Bar>();
+
+        for(Bar bar : barsForVoice){
+            List<SoundEvent> soundEventsList = bar.getEvents();
+            Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
+            List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
+
+            for(SoundEvent soundEventInBar : soundEventsList){
+                Sound sound = soundEventInBar.getSound();
+
+                List<Pitch> pitchList = sound.getPitches();
+                List<Pitch> newPitchList = new ArrayList<Pitch>();
+
+                for(Pitch pitchOfSound : pitchList){
+                    Letter letter = pitchOfSound.getLetter();
+                    letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
+                    Accidental accidentalOfSound = pitchOfSound.getAccidental();
+
+                    // When there is no accidental on a note then the key signature
+                    // and previous accidentals on the same note earlier in the bar can be applied.
+                    // Anything that has an accidental does not get altered, instead its accidental is
+                    // stored in a map so it can be applied to later notes, in the same bar, of the same letter.
+                    if(accidentalOfSound == Accidental.NONE){
+                        Pitch newPitch = new Pitch(letter, letterToAccidental.get(letter), pitchOfSound.getOctave());
+                        newPitchList.add(newPitch);
+                    } else{
+                        letterToAccidental.put(letter, accidentalOfSound);
+                        newPitchList.add(pitchOfSound);
+                    }
+                }
+
+
+                Sound newSound = new Sound(newPitchList);
+                SoundEvent newSoundEvent = new SoundEvent(newSound, soundEventInBar.getDuration());
+                newSoundEventsList.add(newSoundEvent);
+
+
+            }
+
+            Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getBeginRepeat(),bar.getEndRepeat(),bar.getRepeatEnding());
+            newBars.add(newBar);
+
         }
-   
+
         Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
         newVoicesToBars.put(voice,newBars);
         return new Song(newVoicesToBars,song.getIndex(),song.getTitle(),song.getComposer(),song.getMeterNumerator(),
                 song.getMeterDenominator(),song.getDefaultDuration(),song.getKeySignature(),song.getBeatDuration(),
                 song.getBeatsPerMinute());
-        
+
     }
     
     
