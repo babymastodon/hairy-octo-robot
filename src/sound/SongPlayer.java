@@ -16,42 +16,37 @@ public class SongPlayer {
     
     
     public void play(){
-        
+
         SequencePlayer player;
         int startTick = 0;
-        
+
         try {
             LyricListener listener = new LyricListener() {
                 public void processLyricEvent(String text) {
                     System.out.println(text);
                 }
             };
-            
+
             player = new SequencePlayer(song.getBeatsPerMinute(), song.getTicksPerBeat(), listener);
-            
+
             List<PlayableSoundEvent> soundEventsList = song.getEvents();
-            
+
             for(PlayableSoundEvent soundEvent: soundEventsList){
                 Sound sound = soundEvent.getSound();
-                
-                if(sound.getClass() == Rest.class){
-                    startTick += soundEvent.getTicks();
-                } else if(sound.getClass() == Note.class || sound.getClass() == Chord.class){
-                    List<Pitch> pitchList = sound.getPitches();
-                    System.out.println("Size of pitch list: " + pitchList.size());
-                    
-                    for(Pitch pitchOfSound : pitchList){
-                        player.addNote(pitchOfSound.toMidiNote(),startTick,soundEvent.getTicks());
-                        System.out.println("ST: " + startTick + "  TL: " + soundEvent.getTicks());
-                    }
-                    
-                    startTick += soundEvent.getTicks();
+
+                List<Pitch> pitchList = sound.getPitches();
+                System.out.println("Size of pitch list: " + pitchList.size());
+
+                for(Pitch pitchOfSound : pitchList){
+                    player.addNote(pitchOfSound.toMidiNote(),startTick,soundEvent.getTicks());
+                    System.out.println("ST: " + startTick + "  TL: " + soundEvent.getTicks());
                 }
+
+                startTick += soundEvent.getTicks();
             }
-   
-                
+
             player.play();
-            
+
         } catch (MidiUnavailableException e) {
             e.printStackTrace();
         } catch (InvalidMidiDataException e) {
