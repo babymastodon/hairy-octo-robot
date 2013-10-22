@@ -1,24 +1,40 @@
 package sound;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
-public interface Sound {
+/**
+ * TODO: write spec
+ * TODO: write test
+ */
+public class Sound {
 
-    /**
-     * TODO: write spec
-     */
-    public List<Pitch> getPitches();
+    private final List<Pitch> pitch_list;
 
+    public Sound(List<Pitch> pitches){
+        List<Pitch> tmp_list = new ArrayList<Pitch>(pitches);
+        this.pitch_list = Collections.unmodifiableList(tmp_list);
+    }
 
-    /**
-     * TODO: write spec
-     */
-    public boolean equals(Object other);
+    
+    public List<Pitch> getPitches(){
+        return pitch_list;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj.getClass() != this.getClass())
+            return false;
+        Sound that = (Sound) obj;
+        return this.pitch_list.equals(that.getPitches());
+    }
 
-    /**
-     * TODO: write spec
-     */
-    public int hashCode();
+    @Override
+    public int hashCode() {
+        return pitch_list.hashCode();
+    }
 
 }
