@@ -14,64 +14,60 @@ public class SongConverter {
     
     private Song fillInAccidentals(){
         List<Voice> voicesList = song.listVoices();
+        Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
+      
+        for(Voice voice : voicesList){
+            List<Bar> barsForVoice = song.getBars(voice);
+            List<Bar> newBarsForVoice = new ArrayList<Bar>();
 
-        //TODO: Handle multiple voices
+            for(Bar bar : barsForVoice){
+                List<SoundEvent> soundEventsList = bar.getEvents();
+                Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
+                List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
 
-        Voice voice = voicesList.get(0);
-        List<Bar> barsForVoice = song.getBars(voice);
+                for(SoundEvent soundEventInBar : soundEventsList){
+                    Sound sound = soundEventInBar.getSound();
+                    List<Pitch> pitchList = sound.getPitches();
+                    List<Pitch> newPitchList = new ArrayList<Pitch>();
 
-        List<Bar> newBars = new ArrayList<Bar>();
+                    for(Pitch pitchOfSound : pitchList){
+                        Letter letter = pitchOfSound.getLetter();
+                        letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
+                        Accidental accidentalOfSound = pitchOfSound.getAccidental();
 
-        for(Bar bar : barsForVoice){
-            List<SoundEvent> soundEventsList = bar.getEvents();
-            Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
-            List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
-
-            for(SoundEvent soundEventInBar : soundEventsList){
-                Sound sound = soundEventInBar.getSound();
-
-                List<Pitch> pitchList = sound.getPitches();
-                List<Pitch> newPitchList = new ArrayList<Pitch>();
-
-                for(Pitch pitchOfSound : pitchList){
-                    Letter letter = pitchOfSound.getLetter();
-                    letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
-                    Accidental accidentalOfSound = pitchOfSound.getAccidental();
-
-                    // When there is no accidental on a note then the key signature
-                    // and previous accidentals on the same note earlier in the bar can be applied.
-                    // Anything that has an accidental does not get altered, instead its accidental is
-                    // stored in a map so it can be applied to later notes, in the same bar, of the same letter.
-                    if(accidentalOfSound == Accidental.NONE){
-                        Pitch newPitch = new Pitch(letter, letterToAccidental.get(letter), pitchOfSound.getOctave());
-                        newPitchList.add(newPitch);
-                    } else{
-                        letterToAccidental.put(letter, accidentalOfSound);
-                        newPitchList.add(pitchOfSound);
+                        // When there is no accidental on a note then the key signature
+                        // and previous accidentals on the same note earlier in the bar can be applied.
+                        // Anything that has an accidental does not get altered, instead its accidental is
+                        // stored in a map so it can be applied to later notes, in the same bar, of the same letter.
+                        if(accidentalOfSound == Accidental.NONE){
+                            Pitch newPitch = new Pitch(letter, letterToAccidental.get(letter), pitchOfSound.getOctave());
+                            newPitchList.add(newPitch);
+                        } else{
+                            letterToAccidental.put(letter, accidentalOfSound);
+                            newPitchList.add(pitchOfSound);
+                        }
                     }
+
+                    Sound newSound = new Sound(newPitchList);
+                    SoundEvent newSoundEvent = new SoundEvent(newSound, soundEventInBar.getDuration());
+                    newSoundEventsList.add(newSoundEvent);
+
                 }
 
-
-                Sound newSound = new Sound(newPitchList);
-                SoundEvent newSoundEvent = new SoundEvent(newSound, soundEventInBar.getDuration());
-                newSoundEventsList.add(newSoundEvent);
-
+                Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getBeginRepeat(),bar.getEndRepeat(),bar.getRepeatEnding());
+                newBarsForVoice.add(newBar);
 
             }
 
-            Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getBeginRepeat(),bar.getEndRepeat(),bar.getRepeatEnding());
-            newBars.add(newBar);
-
+            newVoicesToBars.put(voice,newBarsForVoice);
         }
 
-        Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
-        newVoicesToBars.put(voice,newBars);
         return new Song(newVoicesToBars,song.getIndex(),song.getTitle(),song.getComposer(),song.getMeterNumerator(),
                 song.getMeterDenominator(),song.getDefaultDuration(),song.getKeySignature(),song.getBeatDuration(),
                 song.getBeatsPerMinute());
 
     }
-    
+
     
     private int calcGCD(Song song){
         List<Voice> voicesList = song.listVoices();
