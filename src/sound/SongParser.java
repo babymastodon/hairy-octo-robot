@@ -13,7 +13,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 public class SongParser {
 	/**
-	 * TODO: spec & test
+	 * TODO: make this class follow the spec
 	 */
 	public void parse(String abcFile) {
 		runListener(abcFile);

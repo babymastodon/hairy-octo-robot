@@ -3,6 +3,12 @@ package sound;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * A mapping from letters to accidentals as given by
+ * a standard musical key signature.
+ *
+ * Immutable object.
+ */
 public class KeySignature {
 
     // The order that flats appear in key signatures
@@ -13,8 +19,15 @@ public class KeySignature {
     private final Map<Letter, Accidental> letterMap;
 
     /**
-     * TODO: write doc
-     * TODO: write tests
+     * Construct a KeySignature given a musical key.
+     *
+     * A musical key consists of a letter, a single accidental,
+     * and whether the key is major or minor. For example, 
+     * A flat minor is an example of a musical key.
+     *
+     * @param letter the letter of the musical key
+     * @param accidental the accidental of the key, NATURAL if no accidental
+     * @param major true if the key is major. false if minor
      */
     public KeySignature(Letter letter, SingleAccidental accidental, boolean major){
         // The number of flats in the key signature. If the number is negative,
@@ -59,7 +72,10 @@ public class KeySignature {
 
 
     /**
-     * TODO: write spec
+     * Get the accidental for the given letter as
+     * prescribed by the key signature.
+     *
+     * @param letter the letter that is being queried
      */
     public Accidental getAccidental(Letter letter){
         return letterMap.get(letter);

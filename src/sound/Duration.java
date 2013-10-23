@@ -1,5 +1,9 @@
 package sound;
 
+/**
+ * A musical duration, represented
+ * as a fraction in reduced form.
+ */
 public class Duration {
 
     private int numerator;
@@ -8,8 +12,10 @@ public class Duration {
 
     /**
      * Create a duration object with the given numerator
-     * and denominator. Automatically reduces the
-     * fraction to lowest terms.
+     * and denominator.
+     *
+     * The arguments need not be in reduced-form, but when
+     * the duration is constructed, they are reduced.
      *
      * @param numerator numberator of the fraction. Positive
      *      and non-zero
@@ -24,29 +30,39 @@ public class Duration {
 
 
     /**
-     * TODO: write doc
+     * Get the numerator of the duration in reduced form.
+     *
+     * @return the numerator
      */
     public int getNumerator(){
         return numerator;
     }
 
     /**
-     * TODO: write doc
+     * Get the denominator of the duration in reduced form.
+     *
+     * @return the denominator 
      */
     public int getDenominator(){
         return denominator;
     }
 
     /**
-     * TODO: write doc
+     * Add this duration to the other duration and return
+     * a new Duration containing the sum (in reduced form).
+     *
+     * @return a new duration contianing this + other
      */
     public Duration add(Duration other){
-        return new Duration(numerator + other.numerator,
-                            denominator + other.denominator);
+        return new Duration(numerator*other.denominator + other.numerator*denominator,
+                            denominator*other.denominator);
     }
 
     /**
-     * TODO: write doc
+     * Multiply this duration with the other duration and return
+     * a new Duration containing the product (in reduced form).
+     *
+     * @return A new duration containing this * other
      */
     public Duration mul(Duration other){
         return new Duration(numerator * other.numerator,
@@ -54,7 +70,10 @@ public class Duration {
     }
 
     /**
-     * TODO: write doc
+     * Divide this duration by the other duration and return
+     * a new Duration containing the quotient (in reduced form).
+     *
+     * @return A new duration containing this / other
      */
     public Duration div(Duration other){
         return new Duration(numerator * other.denominator,
@@ -71,6 +90,12 @@ public class Duration {
     }
 
 
+    /**
+     * Two durations are equal if their fractions (numerator/denominator)
+     * have the same value.
+     *
+     * @return true of the two objects are semanticaly equal
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null)
@@ -82,6 +107,11 @@ public class Duration {
             this.denominator == that.denominator;
     }
 
+    /**
+     * Updated to reflect the new equals function.
+     *
+     * @return an integer hashcode.
+     */
     @Override
     public int hashCode() {
         return numerator * 1253 + denominator * 91;
