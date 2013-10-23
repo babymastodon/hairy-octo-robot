@@ -11,39 +11,53 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+/**
+ * A helper-class for parsing strings into Song objects.
+ */
 public class SongParser {
-	/**
-	 * TODO: make this class follow the spec
-	 */
-	public void parse(String abcFile) {
-		runListener(abcFile);
-	}
 
-	/**
-	 * Runs the listener on the given input string.
-	 * 
-	 * @param input
-	 *            The input string.
-	 */
-	private void runListener(String input) {
-		// Create a stream of tokens using the lexer.
-		CharStream stream = new ANTLRInputStream(input);
-		ABCMusicLexer lexer = new ABCMusicLexer(stream);
-		lexer.reportErrorsAsExceptions();
-		TokenStream tokens = new CommonTokenStream(lexer);
+    private final Song song;
 
-		// Feed the tokens into the parser.
-		ABCMusicParser parser = new ABCMusicParser(tokens);
-		parser.reportErrorsAsExceptions();
+    /**
+     * Create a SongParser object which parses the given
+     * string into a song.
+     * 
+     * @param input The input string.
+     */
+    public SongParser(String abcFile) {
+        song = runListener(abcFile);
+    }
 
-		// Generate the parse tree using the starter rule.
-		ParseTree tree;
-		tree = parser.abctune(); // "abctune" is the starter rule.
+    /**
+     * Return the parsed AST object.
+     *
+     * @return a Song object containing the parsed data.
+     */
+    public Song getSong(){
+        return song;
+    }
 
-		// Walk the tree with the listener.
-		ParseTreeWalker walker = new ParseTreeWalker();
-		ParseTreeListener listener = new Listener();
-		walker.walk(listener, tree);
-		// return ((Listener) listener).getSong();
-	}
+    private Song runListener(String input) {
+        // Create a stream of tokens using the lexer.
+        CharStream stream = new ANTLRInputStream(input);
+        ABCMusicLexer lexer = new ABCMusicLexer(stream);
+        lexer.reportErrorsAsExceptions();
+        TokenStream tokens = new CommonTokenStream(lexer);
+
+        // Feed the tokens into the parser.
+        ABCMusicParser parser = new ABCMusicParser(tokens);
+        parser.reportErrorsAsExceptions();
+
+        // Generate the parse tree using the starter rule.
+        ParseTree tree;
+        tree = parser.abctune(); // "abctune" is the starter rule.
+
+        // Walk the tree with the listener.
+        ParseTreeWalker walker = new ParseTreeWalker();
+        ParseTreeListener listener = new Listener();
+        walker.walk(listener, tree);
+        // return ((Listener) listener).getSong();
+        
+        return null;
+    }
 }
