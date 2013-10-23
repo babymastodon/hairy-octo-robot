@@ -1,6 +1,15 @@
 package sound;
 import java.util.*;
 
+/**
+ * Lists of PlayableSoundEvents which are to be played
+ * in sequences at a particular tempo.
+ *
+ * More specifically, this objects contains a map from 
+ * Voices to Lists of PlayableSoundEvents. The Voices are
+ * expected to be played in parallel, while the PlayableSoundEvents
+ * of any pariticular Voice are to be played in sequence.
+ */
 public class PlayableSong {
     /*
      * Rep invariant:

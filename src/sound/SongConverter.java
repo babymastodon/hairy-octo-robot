@@ -2,6 +2,9 @@ package sound;
 
 import java.util.*;
 
+/**
+ * Converts the given Song object into a PlayableSong object.
+ */
 public class SongConverter {
     
     

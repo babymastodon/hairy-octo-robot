@@ -102,6 +102,12 @@ public class PlayableSoundEvent {
 
 
     
+    /**
+     * Two playable sound events are semantically equal if they
+     * have the same sound, duration (in ticks), and lyrics.
+     *
+     * @return true of the other object is semantically equal to this.
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null){
@@ -121,6 +127,11 @@ public class PlayableSoundEvent {
 
     
     
+    /**
+     * Updated for the new equals function.
+     *
+     * @return an integer hashcode.
+     */
     @Override
     public int hashCode() {
         return sound.hashCode() + lyric.hashCode() + ticks;

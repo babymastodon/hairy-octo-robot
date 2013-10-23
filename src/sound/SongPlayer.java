@@ -4,17 +4,31 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiUnavailableException;
 import java.util.*;
 
+/**
+ * Plays the given PlayableSong object over the Java
+ * MIDI interface, and prints lyrics to the given LyricListener.
+ */
 public class SongPlayer {
     
     PlayableSong song;
     
     
+    /**
+     * Construct a SongPlayer that will play the given song
+     * and will pass lyrics to the given LyricListener.
+     *
+     * @param song the song to be played
+     * @param listener the lyric listener that is to recieve the lyrics
+     */
     //TODO: handle LyricListener
     public SongPlayer(PlayableSong song){
         this.song = song;
     }
     
     
+    /**
+     * Play the song from start to finish.
+     */
     public void play(){
 
         SequencePlayer player;

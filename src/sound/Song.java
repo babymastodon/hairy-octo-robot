@@ -3,6 +3,16 @@ package sound;
 import java.util.*;
 
 
+/**
+ * An Abstract Syntax Tree containing the song information
+ * of a parsed abc file.
+ *
+ * Contains sequences of Bar objects organized by Voice (using
+ * the default voice if none is specified) and additional metadata
+ * from the header of the abc file.
+ *
+ * Immutable object.
+ */
 public class Song {
     /*
      * Representation invariant:
