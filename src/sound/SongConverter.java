@@ -4,12 +4,15 @@ import java.util.*;
 
 public class SongConverter {
     
+    
     private final Song song;
 
+    
     
     public SongConverter(Song song){
         this.song = song;
     }
+    
     
     
     private Song fillInAccidentals(){
@@ -69,7 +72,8 @@ public class SongConverter {
     }
 
     
-    private int calcGCD(Song song){
+    
+    private int calcTicksPerBeat(Song song){
         List<Voice> voicesList = song.listVoices();
         Set<Integer> setOfDenominators = new TreeSet<Integer>();
         setOfDenominators.add(song.getBeatDuration().getDenominator());
@@ -96,9 +100,10 @@ public class SongConverter {
             previousLCM = lcm;
         }
         
-        return lcm;
-        
+        return lcm;     
     }
+    
+    
     
     private int GCD(int a, int b) {
         if (b == 0) return (a);
@@ -106,40 +111,41 @@ public class SongConverter {
     }
     
     
+    
     private PlayableSong convert(int gcd, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
-        //TODO: handle multiple voices and lyrics
+        //TODO: handle lyrics and repeated bars
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
         int ticksPerBeat = gcd;
         
-        Voice voice = voicesList.get(0);
+        Map<Voice,List<PlayableSoundEvent>> newVoicesToSoundEvent = new HashMap<Voice,List<PlayableSoundEvent>>();
         
-        List<PlayableSoundEvent> playableSoundEventList = new ArrayList<PlayableSoundEvent>();
-
-        List<Bar> barsForVoice = songAccidentals.getBars(voice);
-
-        for(Bar bar: barsForVoice){
-            List<SoundEvent> soundEventsList = bar.getEvents();
+        for(Voice voice : voicesList){
             
-            for(SoundEvent soundEvent : soundEventsList){
-                Duration absoluteDuration = soundEvent.getDuration().mul(songAccidentals.getDefaultDuration());
-                int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
-                System.out.println("Numticks: " + numTicks);
-                playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
+            List<PlayableSoundEvent> playableSoundEventList = new ArrayList<PlayableSoundEvent>();
+            List<Bar> barsForVoice = songAccidentals.getBars(voice);
+
+            for(Bar bar: barsForVoice){
+                List<SoundEvent> soundEventsList = bar.getEvents();
+
+                for(SoundEvent soundEvent : soundEventsList){
+                    int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
+                    playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
+                }
             }
+            
+            newVoicesToSoundEvent.put(voice, playableSoundEventList);
+            
         }
         
-        return new PlayableSong(playableSoundEventList,beatsPerMinute,ticksPerBeat);
-        
+        return new PlayableSong(newVoicesToSoundEvent,beatsPerMinute,ticksPerBeat);       
     }
     
     
     
     public PlayableSong getResult(){
         Song songWithFilledInAccidentals = fillInAccidentals();
-        int gcd = calcGCD(songWithFilledInAccidentals);
-        System.out.println("GCD: " + gcd);
-        return convert(gcd,songWithFilledInAccidentals);
-        
+        int gcd = calcTicksPerBeat(songWithFilledInAccidentals);
+        return convert(gcd,songWithFilledInAccidentals);    
     }
 }

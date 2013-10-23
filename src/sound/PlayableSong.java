@@ -8,7 +8,7 @@ public class PlayableSong {
      * ticksPerBeat > 0
      */
     
-    private final List<PlayableSoundEvent> events;
+    private final Map<Voice, List<PlayableSoundEvent>> voiceToEvents;
     private final int beatsPerMinute;
     private final int ticksPerBeat;
     
@@ -22,10 +22,27 @@ public class PlayableSong {
      * @param ticksPerBeat the number of time ticks in each beat. Requires 
      *        ticksPerBeat > 0.
      */
-    public PlayableSong(List<PlayableSoundEvent> events, int beatsPerMinute, int ticksPerBeat){
+    public PlayableSong(Map<Voice, List<PlayableSoundEvent>> eventMap, int beatsPerMinute, int ticksPerBeat){
         this.beatsPerMinute = beatsPerMinute;
         this.ticksPerBeat = ticksPerBeat;
-        this.events =  (ArrayList<PlayableSoundEvent>)((ArrayList<PlayableSoundEvent>)events).clone();
+        
+        this.voiceToEvents = new HashMap<Voice,List<PlayableSoundEvent>>();
+        
+        // below we deep copy the eventMap Map
+        Set<Voice> keys = eventMap.keySet();
+        Iterator<Voice> iteratorOfKeys = keys.iterator();
+        
+        while(iteratorOfKeys.hasNext()){
+            Voice voiceKey = iteratorOfKeys.next();
+            List<PlayableSoundEvent> soundEventList;
+           
+            soundEventList = (ArrayList<PlayableSoundEvent>) ((ArrayList<PlayableSoundEvent>)eventMap.get(voiceKey)).clone();
+            
+            this.voiceToEvents.put(voiceKey, soundEventList);
+        }
+        
+        System.out.println("Voice size in object1: " + this.voiceToEvents.keySet().size());
+        System.out.println("Voice size in object2: " +  voiceToEvents.keySet().size());
         
         checkRep();
     }
@@ -37,8 +54,24 @@ public class PlayableSong {
      * 
      * @return the PlayableSoundEvent list
      */
-    public List<PlayableSoundEvent> getEvents(){
-        return Collections.unmodifiableList(events);
+    public List<PlayableSoundEvent> getEvents(Voice voice){
+        return Collections.unmodifiableList(voiceToEvents.get(voice));
+    }
+    
+    
+    
+    /**
+     * Returns the voices in the PlayableSong
+     * 
+     * @return the voices in the PlayableSong.
+     */
+    public List<Voice> listVoices(){
+        // The toArray method for Sets requires an array as the parameter
+        // that has the runtime type you want returned. 
+        // That is why voices is created.
+        Voice[] voices = new Voice[]{};
+        
+        return Arrays.asList(voiceToEvents.keySet().toArray(voices));
     }
     
     
@@ -79,14 +112,14 @@ public class PlayableSong {
         
         return (this.ticksPerBeat == that.ticksPerBeat &&
                 this.beatsPerMinute == that.beatsPerMinute &&
-                this.events.equals(that.events));
+                this.voiceToEvents.equals(that.voiceToEvents));
     }
 
     
     
     @Override
     public int hashCode() {
-        return (ticksPerBeat + beatsPerMinute + events.hashCode());
+        return (ticksPerBeat + beatsPerMinute + voiceToEvents.hashCode());
     }
     
     
