@@ -32,7 +32,6 @@ public class SongPlayer {
     public void play(){
 
         SequencePlayer player;
-        int startTick = 0;
 
         try {
             LyricListener listener = new LyricListener() {
@@ -42,21 +41,23 @@ public class SongPlayer {
             };
 
             player = new SequencePlayer(song.getBeatsPerMinute(), song.getTicksPerBeat(), listener);
+            
+            for(Voice voice : song.listVoices()){
+                int startTick = 0;
+                List<PlayableSoundEvent> playableSoundEventsList = song.getEvents(voice);
 
-            List<PlayableSoundEvent> soundEventsList = song.getEvents();
+                for(PlayableSoundEvent playablSoundEvent: playableSoundEventsList){
+                    Sound sound = playablSoundEvent.getSound();
 
-            for(PlayableSoundEvent soundEvent: soundEventsList){
-                Sound sound = soundEvent.getSound();
+                    List<Pitch> pitchList = sound.getPitches();
 
-                List<Pitch> pitchList = sound.getPitches();
-                System.out.println("Size of pitch list: " + pitchList.size());
+                    for(Pitch pitchOfSound : pitchList){
+                        player.addNote(pitchOfSound.toMidiNote(),startTick,playablSoundEvent.getTicks());
+                        System.out.println("ST: " + startTick + "  TL: " + playablSoundEvent.getTicks());
+                    }
 
-                for(Pitch pitchOfSound : pitchList){
-                    player.addNote(pitchOfSound.toMidiNote(),startTick,soundEvent.getTicks());
-                    System.out.println("ST: " + startTick + "  TL: " + soundEvent.getTicks());
+                    startTick += playablSoundEvent.getTicks();
                 }
-
-                startTick += soundEvent.getTicks();
             }
 
             player.play();
