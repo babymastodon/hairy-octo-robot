@@ -164,8 +164,7 @@ public class SongConverter {
                 startIndexToEndIndex.put(startOfRepeats.remove(startOfRepeats.size()-1),i);
             }
         }
-        
-        
+              
         Set<Integer> startIndicesSet = startIndexToEndIndex.keySet();
         
         // we need the list of start indices from greatest to least.
@@ -188,8 +187,7 @@ public class SongConverter {
                 } else{
                     break;
                 }
-            }
-            
+            }         
             
             boolean skippingFirstRepeatEnding = false;
             // go through the list of bars a second time.
@@ -206,8 +204,7 @@ public class SongConverter {
                     expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
                 }
             }
-            
-            
+                       
             // we get rid of the unexpanded bars before
             // we insert the expanded ones.
             for(int i = startIndex; i <= endIndex; i++){
@@ -225,14 +222,12 @@ public class SongConverter {
                 
                 if(otherEndIndex > endIndex && otherStartIndex < startIndex){
                     startIndexToEndIndex.put(otherStartIndex, otherEndIndex + differenceInSizeExpandedUnExpanded);
-                }
+                }  
             }
-            
-               
+                 
         }
         
-        return newBarList;
-        
+        return newBarList;      
     }
     
     
