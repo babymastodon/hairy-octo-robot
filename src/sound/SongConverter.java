@@ -117,7 +117,7 @@ public class SongConverter {
     
     private PlayableSong convert(int gcd, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
-        //TODO: handle lyrics and repeated bars
+        //TODO: handle lyrics
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
         int ticksPerBeat = gcd;
         
@@ -126,11 +126,12 @@ public class SongConverter {
         for(Voice voice : voicesList){
             
             List<PlayableSoundEvent> playableSoundEventList = new ArrayList<PlayableSoundEvent>();
-            List<Bar> barsForVoice = songAccidentals.getBars(voice);
-
-            for(Bar bar: barsForVoice){
-                List<SoundEvent> soundEventsList = bar.getEvents();
-
+            List<Bar> barsForVoice = expandRepeats(songAccidentals.getBars(voice));
+                        
+           
+            for(Bar currentBar: barsForVoice){
+                List<SoundEvent> soundEventsList = currentBar.getEvents();
+                                           
                 for(SoundEvent soundEvent : soundEventsList){
                     int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
                     playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
@@ -142,6 +143,91 @@ public class SongConverter {
         }
         
         return new PlayableSong(newVoicesToSoundEvent,beatsPerMinute,ticksPerBeat);       
+    }
+    
+    
+    
+    private List<Bar> expandRepeats(List<Bar> barList){
+        List<Bar> newBarList = new ArrayList<Bar>(barList);
+        
+        List<Integer> startOfRepeats = new ArrayList<Integer>();
+        Map<Integer,Integer> startIndexToEndIndex = new HashMap<Integer,Integer>();
+        
+        // build up a map that maps the index of a beginRepeat bar to the
+        // corresponding index of an endRepeat bar
+        for(int i = 0; i < barList.size(); i++){
+            Bar currentBar = barList.get(i);
+            if(currentBar.getBeginRepeat()){
+                startOfRepeats.add(i);
+            }
+            if(currentBar.getEndRepeat()){
+                startIndexToEndIndex.put(startOfRepeats.remove(startOfRepeats.size()-1),i);
+            }
+        }
+              
+        Set<Integer> startIndicesSet = startIndexToEndIndex.keySet();
+        
+        // we need the list of start indices from greatest to least.
+        // This way the inner-most/last repeated sections are expanded first.
+        List<Integer> startIndicesList = new ArrayList<Integer>(startIndicesSet);
+        Collections.sort(startIndicesList);
+        Collections.reverse(startIndicesList);
+                
+        for(int startIndex : startIndicesList){
+            int endIndex = startIndexToEndIndex.get(startIndex);
+            List<Bar> barsFromStartToEnd = new ArrayList<Bar>(newBarList.subList(startIndex, endIndex+1));
+            List<Bar> expandedBars = new ArrayList<Bar>();
+            
+            // go through the sub-list of bars the first time.
+            // The first time is simple, we just need to stop if we
+            // reach the second repeat ending
+            for(Bar bar: barsFromStartToEnd){
+                if(bar.getRepeatEnding() != RepeatEnding.SECOND){
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
+                } else{
+                    break;
+                }
+            }         
+            
+            boolean skippingFirstRepeatEnding = false;
+            // go through the list of bars a second time.
+            // The second time we must skip the first repeat ending.
+            for(Bar bar: barsFromStartToEnd){
+                if(bar.getRepeatEnding() == RepeatEnding.FIRST){
+                    skippingFirstRepeatEnding = true;
+                }
+                if(bar.getRepeatEnding() == RepeatEnding.SECOND){
+                    skippingFirstRepeatEnding = false;
+                }
+                
+                if(!skippingFirstRepeatEnding){
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
+                }
+            }
+                       
+            // we get rid of the unexpanded bars before
+            // we insert the expanded ones.
+            for(int i = 0; i <= endIndex - startIndex; i++){
+                newBarList.remove(startIndex);
+            }
+            
+            newBarList.addAll(startIndex,expandedBars);
+            
+            // below we must shift the ending index of any repeated unit that we have
+            // not yet expanded if our inserting of expanded bars would change its index.
+            int differenceInSizeExpandedUnExpanded = expandedBars.size() - barsFromStartToEnd.size();
+            
+            for(int otherStartIndex : startIndicesList){
+                int otherEndIndex = startIndexToEndIndex.get(otherStartIndex);
+                
+                if(otherEndIndex > endIndex && otherStartIndex < startIndex){
+                    startIndexToEndIndex.put(otherStartIndex, otherEndIndex + differenceInSizeExpandedUnExpanded);
+                }  
+            }
+                 
+        }
+        
+        return newBarList;      
     }
     
     

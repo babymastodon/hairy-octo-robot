@@ -50,9 +50,6 @@ public class PlayableSong {
             this.voiceToEvents.put(voiceKey, soundEventList);
         }
         
-        System.out.println("Voice size in object1: " + this.voiceToEvents.keySet().size());
-        System.out.println("Voice size in object2: " +  voiceToEvents.keySet().size());
-        
         checkRep();
     }
     
