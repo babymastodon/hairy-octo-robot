@@ -47,6 +47,33 @@ public class Bar {
     }
 
     /**
+     * Shortcut constructor for a normal Bar with no lyrics.
+     *
+     * @param events a list of sound events representing the note.
+     */
+    public Bar(List<SoundEvent> events){
+        this.events = new ArrayList<SoundEvent>(events);
+        this.lyrics = new ArrayList<Lyric>();
+        this.beginRepeat = false;
+        this.endRepeat = false;
+        this.repeatEnding = RepeatEnding.NONE;
+    }
+
+    /**
+     * Shortcut constructor for a normal Bar with lyrics.
+     *
+     * @param events a list of sound events representing the note.
+     * @param lyrics a list of lyrics to be assigned to the notes
+     */
+    public Bar(List<SoundEvent> events, List<Lyric> lyrics){
+        this.events = new ArrayList<SoundEvent>(events);
+        this.lyrics = new ArrayList<Lyric>(lyrics);
+        this.beginRepeat = false;
+        this.endRepeat = false;
+        this.repeatEnding = RepeatEnding.NONE;
+    }
+
+    /**
      * Return the events (notes) in this bar
      *
      * @return an unmodifiable list of events.

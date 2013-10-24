@@ -6,9 +6,14 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static sound.Letter.*;
+import static sound.Accidental.*;
 
 
 public class SongParserTest {
@@ -16,7 +21,7 @@ public class SongParserTest {
     // TODO: remove this function when done debugging
     @Test
     public void testParsePublic() {
-        readSong("sample_abc/piece_1.abc");
+        readSong("sample_abc/piece1.abc");
     }
 
 
@@ -85,20 +90,20 @@ public class SongParserTest {
     public void testHeaderInvalidSpaces(){
         File basedir = new File("test_abc/header_invalid_spaces");
         for (File file: basedir.listFiles()){
-            shouldFail(file.getPath());
+            shouldFailToParse(file.getPath());
         }
     }
 
 
     /**
      * Should throw error when required fields (X, T, K)
-     * are missing.
+     * are missing or out of order.
      */
     @Test
     public void testHeaderMissingFields(){
         File basedir = new File("test_abc/header_missing_fields");
         for (File file: basedir.listFiles()){
-            shouldFail(file.getPath());
+            shouldFailToParse(file.getPath());
         }
     }
 
@@ -174,7 +179,269 @@ public class SongParserTest {
     }
 
 
-    private void shouldFail(String path){
+    /**
+     * Should recognize octave symbols.
+     *
+     * Valid octave identifiers:
+     *      lowercase/capital letters
+     *      arbitrarily long sequences of commas or apostrophes
+     *
+     */
+    @Test
+    public void testBodyOctaves(){
+        Song s = readSong("test_abc/body_octaves.abc");
+        Letter[] letters = {C, G, B, E, D, C, B, B, E, D};
+        int[] octaves = {0 -1, -2, 1, 2, 1, 0, -1, 2, 3};
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        for (int i=0; i<10; i++){
+            events.add(
+                    new SoundEvent(
+                        new Sound(new Pitch(letters[i], octaves[i])),
+                        new Duration(1,1)));
+        }
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should correctly parse durations.
+     *
+     * Valid Durations: "" "/m" "n" "n/m"
+     *
+     */
+    @Test
+    public void testBodyDurations(){
+        Song s = readSong("test_abc/body_durations.abc");
+        int[] numerators = {1, 5, 3, 1};
+        int[] denominators = {1, 1, 8, 9};
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        for (int i=0; i<4; i++){
+            events.add(
+                    new SoundEvent(
+                        new Sound(new Pitch(C, 1)),
+                        new Duration(1,1)));
+        }
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should correctly parse accidentals.
+     *
+     * Valid Accidentals: ^^ ^ = _ __
+     *
+     */
+    @Test
+    public void testBodyAccidentals(){
+        Song s = readSong("test_abc/body_accidentals.abc");
+        Accidental[] accidentals = {
+            DOUBLE_SHARP, SHARP, NATURAL, FLAT, DOUBLE_FLAT, NONE};
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        for (int i=0; i<6; i++){
+            events.add(
+                    new SoundEvent(
+                        new Sound(new Pitch(C, accidentals[i], 0)),
+                        new Duration(1,1)));
+        }
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should correctly parse a single note with an accidental,
+     * an octave, and a duration modifier.
+     *
+     */
+    @Test
+    public void testBodyComplexNote(){
+        Song s = readSong("test_abc/body_complex_note.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(A,SHARP,2)),
+                    new Duration(1,5)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should correctly parse a single rest with duration.
+     */
+    @Test
+    public void testBodyRests(){
+        Song s = readSong("test_abc/body_rests.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(),
+                    new Duration(4,19)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should correctly parse a single chord with accidentals,
+     * and durations.
+     *
+     * Note, the duration of the entire chord should be the
+     * duration of the first note times the duration of
+     * the bracketed group of notes.
+     */
+    @Test
+    public void testBodyChords(){
+        Song s = readSong("test_abc/body_chords.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(Arrays.asList(
+                        new Pitch(A,SHARP,-1),
+                        new Pitch(A,DOUBLE_FLAT,3),
+                        new Pitch(A,NATURAL,1))),
+                    new Duration(7,5)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should parse a duplet with the proper durations.
+     *
+     * The duration of a SoundEvent in a duplet is equal
+     * to 3/2 times is original duration.
+     */
+    @Test
+    public void testBodyDuplet(){
+        Song s = readSong("test_abc/body_duplet.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(C,SHARP)),
+                    new Duration(3,8)));
+        events.add(
+                new SoundEvent(
+                    new Sound(Arrays.asList(
+                        new Pitch(C),
+                        new Pitch(G))),
+                    new Duration(21,2)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should parse a triplet with the proper durations.
+     *
+     * The duration of a SoundEvent in a triplet is equal
+     * to 2/3 times is original duration.
+     */
+    @Test
+    public void testBodyTriplet(){
+        Song s = readSong("test_abc/body_triplet.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(F,FLAT,-1)),
+                    new Duration(10,3)));
+        events.add(
+                new SoundEvent(
+                    new Sound(Arrays.asList(
+                        new Pitch(C),
+                        new Pitch(G))),
+                    new Duration(2,15)));
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(F)),
+                    new Duration(2,3)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should parse a quadruplet with the proper durations.
+     *
+     * The duration of a SoundEvent in a quadruplet is equal
+     * to 3/4 times is original duration.
+     */
+    @Test
+    public void testBodyQuadruplet(){
+        Song s = readSong("test_abc/body_quadruplet.abc");
+
+        List<SoundEvent> events = new ArrayList<SoundEvent>();
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(A)),
+                    new Duration(3,4)));
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(F,FLAT,1)),
+                    new Duration(15,4)));
+        events.add(
+                new SoundEvent(
+                    new Sound(Arrays.asList(
+                        new Pitch(C),
+                        new Pitch(G))),
+                    new Duration(3,20)));
+        events.add(
+                new SoundEvent(
+                    new Sound(new Pitch(F)),
+                    new Duration(3,4)));
+
+        Bar expected = new Bar(events);
+        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+    }
+
+
+    /**
+     * Should parse a single repeated bar.
+     */
+    @Test
+    public void testBodySimpleRepeat(){
+        Song s = readSong("test_abc/body_repeat_simple.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 1);
+        assertEquals(bars.get(0).getBeginRepeat(), true);
+        assertEquals(bars.get(0).getEndRepeat(), true);
+    }
+
+
+    /**
+     * Should parse two repeated bars, where the
+     * first bar does not have a repeat begin.
+     */
+    @Test
+    public void testBodyTwoBarRepeat(){
+        Song s = readSong("test_abc/body_repeat_two_bar.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getBeginRepeat(), false);
+        assertEquals(bars.get(1).getEndRepeat(), false);
+        assertEquals(bars.get(1).getEndRepeat(), true);
+    }
+
+
+    private void shouldFailToParse(String path){
         try{
             readSong(path);
         } catch (Exception e){

@@ -1,5 +1,6 @@
 package sound;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +28,25 @@ public class Sound {
         // remove potential duplicates in the given list
         List<Pitch> tmp_list = new ArrayList<Pitch>(new HashSet<Pitch>(pitches));
         this.pitch_list = Collections.unmodifiableList(tmp_list);
+    }
+
+
+    /**
+     * Construct a Sound with a single pitch.
+     *
+     * @param pitch a single pitch
+     */
+    public Sound(Pitch pitch){
+        this.pitch_list = Collections.unmodifiableList(
+                new ArrayList<Pitch>(Arrays.asList(pitch)));
+    }
+
+
+    /**
+     * Construct a Sound with no pitches (a rest).
+     */
+    public Sound(){
+        this.pitch_list = new ArrayList<Pitch>();
     }
 
     
