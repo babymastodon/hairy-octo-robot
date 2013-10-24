@@ -424,8 +424,8 @@ public class SongParserTest {
         Song s = readSong("test_abc/body_repeat_simple.abc");
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(bars.size(), 1);
-        assertEquals(bars.get(0).getBeginRepeat(), true);
-        assertEquals(bars.get(0).getEndRepeat(), true);
+        assertEquals(bars.get(0).getPrefix(), BarPrefix.BEGIN_REPEAT);
+        assertEquals(bars.get(0).getSuffix(), BarSuffix.END_REPEAT);
     }
 
 
@@ -438,9 +438,9 @@ public class SongParserTest {
         Song s = readSong("test_abc/body_repeat_two_bar.abc");
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getBeginRepeat(), false);
-        assertEquals(bars.get(1).getEndRepeat(), false);
-        assertEquals(bars.get(1).getEndRepeat(), true);
+        assertEquals(bars.get(0).getPrefix(), BarPrefix.NONE);
+        assertEquals(bars.get(1).getSuffix(), BarSuffix.END_REPEAT);
+        assertEquals(bars.get(1).getPrefix(), BarPrefix.NONE);
     }
 
 
