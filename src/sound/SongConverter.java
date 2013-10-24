@@ -117,7 +117,7 @@ public class SongConverter {
     
     private PlayableSong convert(int gcd, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
-        //TODO: handle lyrics and repeated bars
+        //TODO: handle lyrics
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
         int ticksPerBeat = gcd;
         
@@ -175,7 +175,7 @@ public class SongConverter {
                 
         for(int startIndex : startIndicesList){
             int endIndex = startIndexToEndIndex.get(startIndex);
-            List<Bar> barsFromStartToEnd = newBarList.subList(startIndex, endIndex+1);
+            List<Bar> barsFromStartToEnd = new ArrayList<Bar>(newBarList.subList(startIndex, endIndex+1));
             List<Bar> expandedBars = new ArrayList<Bar>();
             
             // go through the sub-list of bars the first time.
@@ -207,8 +207,8 @@ public class SongConverter {
                        
             // we get rid of the unexpanded bars before
             // we insert the expanded ones.
-            for(int i = startIndex; i <= endIndex; i++){
-                newBarList.remove(i);
+            for(int i = 0; i <= endIndex - startIndex; i++){
+                newBarList.remove(startIndex);
             }
             
             newBarList.addAll(startIndex,expandedBars);
