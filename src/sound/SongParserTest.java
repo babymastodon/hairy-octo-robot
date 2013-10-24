@@ -174,6 +174,39 @@ public class SongParserTest {
     }
 
 
+    /**
+     * Should use the default composer if not provided.
+     *
+     * The default composer is determined by the following
+     * rule:
+     *
+     *      When the field 'C' is omitted, any reasonable
+     *      string will suffice (e.g. "Unknown").
+     *
+     */
+    @Test
+    public void testHeaderDefaultC(){
+        Song s = readSong("test_abc/header_defaults/default_C.abc");
+        assertNotNull(s.getComposer());
+    }
+
+
+    /**
+     * Should recognize octave symbols.
+     *
+     * Including:
+     *
+     *      lowercase/capital letters
+     *      arbitrarily long sequences of commas or apostrophes
+     *
+     */
+    @Test
+    public void testBodyOctaves(){
+        Song s = readSong("test_abc/body_octaves.abc");
+        assertNotNull(s.getComposer());
+    }
+
+
     private void shouldFail(String path){
         try{
             readSong(path);
