@@ -19,9 +19,8 @@ public class Bar {
 
     private final List<SoundEvent> events;
     private final List<Lyric> lyrics;
-    private final boolean beginRepeat;
-    private final boolean endRepeat;
-    private final RepeatEnding repeatEnding;
+    private final BarPrefix prefix;
+    private final BarSuffix suffix;
 
     /**
      * Construct a Bar with the given SoundEvents, Lyrics,
@@ -29,21 +28,15 @@ public class Bar {
      *
      * @param events a list of sound events representing the note.
      * @param lyrics a list of lyrics to be assigned to the notes
-     * @param beginRepeat true if this bar is the beginning of a
-     *        repeated section
-     * @param endRepeat true if this bar is the end of a
-     *        repeated section
-     * @param repeatEnding indicates whether this bar is the beginning
-     *        of the first ending or seconding ending of a repeated
-     *        segments of bars (or none at all).
+     * @param prefix the prefix of the bar @see BarPrefix
+     * @param suffix the suffix of the bar @see BarSuffix
      */
     public Bar(List<SoundEvent> events, List<Lyric> lyrics,
-            boolean beginRepeat, boolean endRepeat, RepeatEnding repeatEnding){
+            BarPrefix prefix, BarSuffix suffix){
         this.events = new ArrayList<SoundEvent>(events);
         this.lyrics = new ArrayList<Lyric>(lyrics);
-        this.beginRepeat = beginRepeat;
-        this.endRepeat = endRepeat;
-        this.repeatEnding = repeatEnding;
+        this.prefix = prefix;
+        this.suffix = suffix;
     }
 
     /**
@@ -54,9 +47,8 @@ public class Bar {
     public Bar(List<SoundEvent> events){
         this.events = new ArrayList<SoundEvent>(events);
         this.lyrics = new ArrayList<Lyric>();
-        this.beginRepeat = false;
-        this.endRepeat = false;
-        this.repeatEnding = RepeatEnding.NONE;
+        this.prefix = BarPrefix.NONE;
+        this.suffix = BarSuffix.NONE;
     }
 
     /**
@@ -68,9 +60,8 @@ public class Bar {
     public Bar(List<SoundEvent> events, List<Lyric> lyrics){
         this.events = new ArrayList<SoundEvent>(events);
         this.lyrics = new ArrayList<Lyric>(lyrics);
-        this.beginRepeat = false;
-        this.endRepeat = false;
-        this.repeatEnding = RepeatEnding.NONE;
+        this.prefix = BarPrefix.NONE;
+        this.suffix = BarSuffix.NONE;
     }
 
     /**
@@ -92,35 +83,20 @@ public class Bar {
     }
 
     /**
-     * Return whether this is the beginning of
-     * a repeated segment.
+     * Return the prefix of this bar
      *
-     * @return true if beginRepeat
+     * @return prefix
      */
-    public boolean getBeginRepeat(){
-        return beginRepeat;
+    public BarPrefix getPrefix(){
+        return prefix;
     }
 
     /**
-     * Return whether this is the end of
-     * a repeated segment.
+     * Return the suffix of this bar.
      *
-     * @return true if endRepeat
+     * @return suffix
      */
-    public boolean getEndRepeat(){
-        return endRepeat;
+    public BarSuffix getSuffix(){
+        return suffix;
     }
-
-    /**
-     * Return the repeat ending if this bar is the
-     * beginning of a numbered ending.
-     *
-     * @return FIRST if first ending, SECOND if second ending,
-     *         or NONE if this is not the beginning of an
-     *         ending
-     */
-    public RepeatEnding getRepeatEnding(){
-        return repeatEnding;
-    }
-
 }

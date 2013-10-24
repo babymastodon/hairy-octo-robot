@@ -60,7 +60,7 @@ public class SongConverter {
 
                 }
 
-                Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getBeginRepeat(),bar.getEndRepeat(),bar.getRepeatEnding());
+                Bar newBar = new Bar(newSoundEventsList,bar.getLyrics(),bar.getPrefix(),bar.getSuffix());
                 newBarsForVoice.add(newBar);
 
             }
@@ -157,10 +157,10 @@ public class SongConverter {
         // corresponding index of an endRepeat bar
         for(int i = 0; i < barList.size(); i++){
             Bar currentBar = barList.get(i);
-            if(currentBar.getBeginRepeat()){
+            if(currentBar.getPrefix() == BarPrefix.BEGIN_REPEAT){
                 startOfRepeats.add(i);
             }
-            if(currentBar.getEndRepeat()){
+            if(currentBar.getSuffix() == BarSuffix.END_REPEAT){
                 startIndexToEndIndex.put(startOfRepeats.remove(startOfRepeats.size()-1),i);
             }
         }
@@ -182,8 +182,8 @@ public class SongConverter {
             // The first time is simple, we just need to stop if we
             // reach the second repeat ending
             for(Bar bar: barsFromStartToEnd){
-                if(bar.getRepeatEnding() != RepeatEnding.SECOND){
-                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
+                if(bar.getPrefix() != BarPrefix.SECOND_ENDING){
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),BarPrefix.NONE,bar.getSuffix()));
                 } else{
                     break;
                 }
@@ -193,15 +193,15 @@ public class SongConverter {
             // go through the list of bars a second time.
             // The second time we must skip the first repeat ending.
             for(Bar bar: barsFromStartToEnd){
-                if(bar.getRepeatEnding() == RepeatEnding.FIRST){
+                if(bar.getPrefix() == BarPrefix.FIRST_ENDING){
                     skippingFirstRepeatEnding = true;
                 }
-                if(bar.getRepeatEnding() == RepeatEnding.SECOND){
+                if(bar.getPrefix() == BarPrefix.SECOND_ENDING){
                     skippingFirstRepeatEnding = false;
                 }
                 
                 if(!skippingFirstRepeatEnding){
-                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),BarPrefix.NONE,bar.getSuffix()));
                 }
             }
                        
