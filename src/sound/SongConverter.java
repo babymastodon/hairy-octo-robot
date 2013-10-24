@@ -184,7 +184,7 @@ public class SongConverter {
             // reach the second repeat ending
             for(Bar bar: barsFromStartToEnd){
                 if(bar.getRepeatEnding() != RepeatEnding.SECOND){
-                    expandedBars.add(bar);
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
                 } else{
                     break;
                 }
@@ -203,7 +203,7 @@ public class SongConverter {
                 }
                 
                 if(!skippingFirstRepeatEnding){
-                    expandedBars.add(bar);
+                    expandedBars.add(new Bar(bar.getEvents(),bar.getLyrics(),false,false,RepeatEnding.NONE));
                 }
             }
             
