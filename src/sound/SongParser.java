@@ -56,8 +56,6 @@ public class SongParser {
         ParseTreeWalker walker = new ParseTreeWalker();
         ParseTreeListener listener = new Listener();
         walker.walk(listener, tree);
-        // return ((Listener) listener).getSong();
-        
-        return null;
+        return ((Listener) listener).getSong();
     }
 }

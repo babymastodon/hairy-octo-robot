@@ -46,7 +46,7 @@ package grammar;
 WHITESPACE : ('\t' | ' ')+ ;
 DIGIT: [0-9]+;
 WORD: [a-zA-Z!.?]+;
-LINEFEED: ('\n')+;
+LINEFEED: (('\n')+ | ('\r\n')+);
 
 /*
  * These are the parser rules. They define the structures used by the parser.
@@ -80,7 +80,8 @@ meter : 'C' | 'C|' | meterfraction;
 meterfraction : DIGIT+ '/' DIGIT+;
 tempo : meterfraction '=' DIGIT+;
 abcmusic : abcline+;
-abcline : element+ LINEFEED (lyric LINEFEED*)* | midtunefield | comment;
+abcline :  notesline (lyric LINEFEED*)* | midtunefield | comment;
+notesline : element+ LINEFEED;
 //abcline : element+ LINEFEED | midtunefield | comment;
 element : noteelement | tupletelement | barline | nthrepeat | ' ' ;
 noteelement : note | multinote;
@@ -109,6 +110,6 @@ comment : '%' text LINEFEED;
 endofline : comment | LINEFEED;
 lyric : 'w:' lyrical_element*;
 lyrical_element : ' '+ | '-' | '_' | '*' | '~' | '\-' | '|' | lyric_text | basenote | rest;
-text : WHITESPACE* WORD WHITESPACE*;
-lyric_text : WHITESPACE* WORD WHITESPACE*;
+text : ' '* WORD ' '*;
+lyric_text : ' '* WORD ' '*;
 space: WHITESPACE;

@@ -63,11 +63,11 @@ public interface ABCMusicListener extends ParseTreeListener {
 	void enterMeterfraction(ABCMusicParser.MeterfractionContext ctx);
 	void exitMeterfraction(ABCMusicParser.MeterfractionContext ctx);
 
-	void enterKey(ABCMusicParser.KeyContext ctx);
-	void exitKey(ABCMusicParser.KeyContext ctx);
-
 	void enterNote(ABCMusicParser.NoteContext ctx);
 	void exitNote(ABCMusicParser.NoteContext ctx);
+
+	void enterKey(ABCMusicParser.KeyContext ctx);
+	void exitKey(ABCMusicParser.KeyContext ctx);
 
 	void enterKeynote(ABCMusicParser.KeynoteContext ctx);
 	void exitKeynote(ABCMusicParser.KeynoteContext ctx);
@@ -95,6 +95,9 @@ public interface ABCMusicListener extends ParseTreeListener {
 
 	void enterFieldnumber(ABCMusicParser.FieldnumberContext ctx);
 	void exitFieldnumber(ABCMusicParser.FieldnumberContext ctx);
+
+	void enterNotesline(ABCMusicParser.NoteslineContext ctx);
+	void exitNotesline(ABCMusicParser.NoteslineContext ctx);
 
 	void enterOctave(ABCMusicParser.OctaveContext ctx);
 	void exitOctave(ABCMusicParser.OctaveContext ctx);
