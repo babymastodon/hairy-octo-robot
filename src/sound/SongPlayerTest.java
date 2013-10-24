@@ -114,10 +114,10 @@ public class SongPlayerTest {
         List<Lyric> lyrics = new ArrayList<Lyric>();
         lyrics.add(new Lyric(""));
         
-        Bar bar1 = new Bar(soundEvents1,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar2 = new Bar(soundEvents2,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar3 = new Bar(soundEvents3,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar4 = new Bar(soundEvents4,lyrics,false,false,RepeatEnding.NONE);
+        Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar2 = new Bar(soundEvents2,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar3 = new Bar(soundEvents3,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar4 = new Bar(soundEvents4,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         
         List<Bar> barsForVoice = new ArrayList<Bar>();
         barsForVoice.add(bar1);
@@ -300,12 +300,12 @@ public class SongPlayerTest {
         List<Lyric> lyrics = new ArrayList<Lyric>();
         lyrics.add(new Lyric(""));
         
-        Bar bar1 = new Bar(soundEvents1,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar2 = new Bar(soundEvents2,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar3 = new Bar(soundEvents3,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar4 = new Bar(soundEvents4,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar5 = new Bar(soundEvents5,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar6 = new Bar(soundEvents6,lyrics,false,false,RepeatEnding.NONE);
+        Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar2 = new Bar(soundEvents2,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar3 = new Bar(soundEvents3,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar4 = new Bar(soundEvents4,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar5 = new Bar(soundEvents5,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar6 = new Bar(soundEvents6,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         
         List<Bar> barsForVoice = new ArrayList<Bar>();
         barsForVoice.add(bar1);
@@ -489,12 +489,12 @@ public class SongPlayerTest {
         List<Lyric> lyrics = new ArrayList<Lyric>();
         lyrics.add(new Lyric(""));
         
-        Bar bar1 = new Bar(soundEvents1,lyrics,true,false,RepeatEnding.NONE);
-        Bar bar2 = new Bar(soundEvents2,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar3 = new Bar(soundEvents3,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar4 = new Bar(soundEvents4,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar5 = new Bar(soundEvents5,lyrics,false,false,RepeatEnding.NONE);
-        Bar bar6 = new Bar(soundEvents6,lyrics,false,true,RepeatEnding.NONE);
+        Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.BEGIN_REPEAT,BarSuffix.NONE);
+        Bar bar2 = new Bar(soundEvents2,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar3 = new Bar(soundEvents3,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar4 = new Bar(soundEvents4,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar5 = new Bar(soundEvents5,lyrics,BarPrefix.NONE,BarSuffix.NONE);
+        Bar bar6 = new Bar(soundEvents6,lyrics,BarPrefix.NONE,BarSuffix.END_REPEAT);
         
         List<Bar> barsForVoice = new ArrayList<Bar>();
         barsForVoice.add(bar1);
