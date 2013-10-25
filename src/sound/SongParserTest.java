@@ -624,7 +624,7 @@ public class SongParserTest {
      */
     @Test
     public void testBodyLyricsEscapedHyphen(){
-        Song s = readSong("test_abc/body_lyrics_excaped_hypen.abc");
+        Song s = readSong("test_abc/body_lyrics_escaped_hyphen.abc");
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(bars.size(), 3);
         assertEquals(bars.get(0).getLyrics().size(), 1);
@@ -639,7 +639,7 @@ public class SongParserTest {
      */
     @Test
     public void testBodyLyricsDoubleHyphen(){
-        Song s = readSong("test_abc/body_lyrics_double_hypen.abc");
+        Song s = readSong("test_abc/body_lyrics_double_hyphen.abc");
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(bars.size(), 3);
         assertEquals(bars.get(0).getLyrics().size(), 1);
@@ -732,7 +732,7 @@ public class SongParserTest {
      *      two '|:' in a row that are not separated by a ':|' or a ':|[2' (same as first case)
      *      two ':|' in a row that are not separated by a '|:' or a '|]'
      *      a '|[1' not followed by a ':|[2'
-     *      a ':|[2' not preceeded by a '|[1'
+     *      a ':|[2' not preceded by a '|[1'
      */
     @Test
     public void testBodyInvalidRepeat(){
