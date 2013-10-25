@@ -101,9 +101,13 @@ public class Listener extends ABCMusicBaseListener {
 			}
 		}
 		if (ctx.noteorrest().pitch().basenote().isEmpty()==false){ //if pitch
-			Letter letter = Letter.fromChar(ctx.noteorrest().pitch().basenote().getText().charAt(0));
-			Accidental accidental = Accidental.NATURAL;;
+			char noteChar = ctx.noteorrest().pitch().basenote().getText().charAt(0);
 			int octave = 0;
+			if(Character.isLowerCase(noteChar)){
+				octave += 1;
+			}
+			Letter letter = Letter.fromChar(noteChar);
+			Accidental accidental = Accidental.NATURAL;;
 			if (ctx.noteorrest().pitch().accidental().isEmpty()==false){
 				String accidentalString = ctx.noteorrest().pitch().accidental().get(0).getText();
 				switch (accidentalString){
@@ -127,25 +131,25 @@ public class Listener extends ABCMusicBaseListener {
 			if (ctx.noteorrest().pitch().octave().isEmpty()==false){
 				String octaveString = ctx.noteorrest().pitch().octave().get(0).getText();
 				if (octaveString == "'"){
-					octave = 1;
+					octave += 1;
 				}
 				else if(octaveString == ","){
-					octave = -1;
+					octave -= 1;
 				}
 			}
 			Duration duration = new Duration(durationNumerator,durationDenominator);
 			Pitch pitch = new Pitch(letter,accidental,octave);
 			Sound sound = new Sound(pitch);
 			SoundEvent note = new SoundEvent(sound,duration);
-			System.out.println(note.getDuration().getNumerator() + " " + note.getDuration().getDenominator());
+			//System.out.println(note.getDuration().getNumerator() + " " + note.getDuration().getDenominator());
 			currentNoteList.add(note);
-			//System.out.println("letter: " + letter + "; accidental: " + accidental + "; octave: " + octave + " ;num: " + durationNumerator + " ;denom: " + durationDenominator);
+			System.out.println("letter: " + letter + "; accidental: " + accidental + "; octave: " + octave + " ;num: " + durationNumerator + " ;denom: " + durationDenominator);
 		}
 	}
 
 	@Override
 	public void enterMultinote(ABCMusicParser.MultinoteContext ctx) {
-		
+
 	}
 
 
@@ -167,12 +171,12 @@ public class Listener extends ABCMusicBaseListener {
 	public void enterBarline(ABCMusicParser.BarlineContext ctx) {
 		String barString = ctx.getText();
 		switch (barString){
-			case "|]":
-			case "|":
-				Bar bar  = new Bar(currentNoteList);
-				barList.add(bar);
-				currentNoteList = new ArrayList<SoundEvent>();
-				break;
+		case "|]":
+		case "|":
+			Bar bar  = new Bar(currentNoteList);
+			barList.add(bar);
+			currentNoteList = new ArrayList<SoundEvent>();
+			break;
 		}
 	}
 
@@ -212,7 +216,7 @@ public class Listener extends ABCMusicBaseListener {
 
 	@Override
 	public void enterTupletelement(ABCMusicParser.TupletelementContext ctx) {
-		
+
 	}
 
 	@Override
@@ -227,15 +231,15 @@ public class Listener extends ABCMusicBaseListener {
 				+ defaultDuration.getNumerator() + "/"
 				+ defaultDuration.getDenominator());
 	}
-	
+
 	@Override public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
 		if (barList.isEmpty()==false){
 			barMap.put(currentVoice,barList);
 			System.out.println("Voice and bars mapped." + barMap.keySet());
 		}
 		if (defaultDuration==null){ // (L) meter<0.75 default note length is
-		// sixteenth note
-		// meter>=.75, it is an eighth note
+			// sixteenth note
+			// meter>=.75, it is an eighth note
 			float meter = meterNumerator/(float)meterDenominator;
 			if (meter<.75) {
 				defaultDuration = new Duration(1,16);
@@ -248,10 +252,10 @@ public class Listener extends ABCMusicBaseListener {
 			beatDuration = defaultDuration;
 		}
 		song = new Song( barMap, index, title,
-                composer, meterNumerator, meterDenominator, 
-                defaultDuration, keySignature, beatDuration, beatsPerMinute);
+				composer, meterNumerator, meterDenominator, 
+				defaultDuration, keySignature, beatDuration, beatsPerMinute);
 	}
-	
+
 	public Song getSong(){
 		return song;
 	}
