@@ -207,7 +207,8 @@ public class SongParserTest {
 
 
     /**
-     * Should correctly parse durations.
+     * Should correctly parse durations, and not complain
+     * about bar lengths that don't fit the meter.
      *
      * Valid Durations: "" "/m" "n" "n/m"
      *
@@ -223,7 +224,7 @@ public class SongParserTest {
             events.add(
                     new SoundEvent(
                         new Sound(new Pitch(C, 1)),
-                        new Duration(1,1)));
+                        new Duration(numerators[i], denominators[i])));
         }
 
         Bar expected = new Bar(events);
@@ -438,6 +439,326 @@ public class SongParserTest {
         assertEquals(bars.get(0).getPrefix(), BarPrefix.NONE);
         assertEquals(bars.get(1).getSuffix(), BarSuffix.END_REPEAT);
         assertEquals(bars.get(1).getPrefix(), BarPrefix.NONE);
+    }
+
+
+    /**
+     * Should parse a repeated segment where the first bar
+     * of the repeated segment comes immediately after the
+     * end of a section end.
+     */
+    @Test
+    public void testBodyRepeatSectionEnd(){
+        Song s = readSong("test_abc/body_repeat_section_end.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getSuffix(), BarSuffix.END_SECTION);
+        assertEquals(bars.get(2).getSuffix(), BarSuffix.END_REPEAT);
+    }
+
+
+    /**
+     * Should parse the begin section identifier.
+     */
+    @Test
+    public void testBodySectionBegin(){
+        Song s = readSong("test_abc/body_section_begin.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 1);
+        assertEquals(bars.get(0).getPrefix(), BarPrefix.BEGIN_SECTION);
+    }
+
+
+    /**
+     * Should parse the FIRST_ENDING and SECOND_ENDING
+     * identifiers inside a repeat without a beginning.
+     */
+    @Test
+    public void testBodyRepeatEndingNumber(){
+        Song s = readSong("test_abc/body_repeat_ending_number.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(1).getPrefix(), BarPrefix.FIRST_ENDING);
+        assertEquals(bars.get(2).getPrefix(), BarPrefix.SECOND_ENDING);
+        assertEquals(bars.get(2).getSuffix(), BarSuffix.END_SECTION);
+    }
+
+
+    /**
+     * Test that lyrics are assigned to the proper bars
+     * on the previous line when here are not enough lyrics
+     * to fill the bar.
+     *
+     * In this situation, there should be fewer lyric
+     * object in the bar than there are "notes". Blank
+     * lyrics should not be created.
+     */
+    @Test
+    public void testBodyLyricsBar(){
+        Song s = readSong("test_abc/body_lyrics_bar.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test that bar symbol is ignored when there are enough
+     * lyrics to fill the bar.
+     */
+    @Test
+    public void testBodyLyricsSkipBar(){
+        Song s = readSong("test_abc/body_lyrics_skip_bar.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 2);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
+        assertEquals(bars.get(0).getLyrics().get(1).getText(), "def");
+        assertEquals(bars.get(1).getLyrics().size(), 2);
+    }
+
+
+    /**
+     * Test that the lyrics automatically advance to the next bar
+     * when there are enough lyrics to fill the current bar, including 
+     * in the case of the last bar, where extra lyrics are discarded.
+     */
+    @Test
+    public void testBodyLyricsNoBars(){
+        Song s = readSong("test_abc/body_lyrics_no_bars.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().size(), 2);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
+        assertEquals(bars.get(1).getLyrics().get(1).getText(), "abc");
+    }
+
+
+    /**
+     * Test that lyrics within a marked bar are truncated
+     * if there are too many syllables.
+     */
+    @Test
+    public void testBodyLyricsTruncateBar(){
+        Song s = readSong("test_abc/body_lyrics_truncate_bar.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().size(), 2);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "abc");
+        assertEquals(bars.get(1).getLyrics().get(1).getText(), "def");
+    }
+
+
+    /**
+     * Test lyrics containing a hyphen.
+     */
+    @Test
+    public void testBodyLyricsHyphen(){
+        Song s = readSong("test_abc/body_lyrics_hyphen.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test lyrics containing an underscore.
+     *
+     * An underscore is basically the same as a blank syllable "*".
+     */
+    @Test
+    public void testBodyLyricsUnderscore(){
+        Song s = readSong("test_abc/body_lyrics_underscore.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
+        assertEquals(bars.get(2).getLyrics().size(), 1);
+        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test lyrics containing a star.
+     */
+    @Test
+    public void testBodyLyricsStar(){
+        Song s = readSong("test_abc/body_lyrics_star.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
+        assertEquals(bars.get(2).getLyrics().size(), 1);
+        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test lyrics containing a tilde.
+     */
+    @Test
+    public void testBodyLyricsTilde(){
+        Song s = readSong("test_abc/body_lyrics_tilde.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 2);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc def");
+        assertEquals(bars.get(1).getLyrics().size(), 0);
+    }
+
+
+    /**
+     * Test lyrics containing an escaped hyphen.
+     */
+    @Test
+    public void testBodyLyricsEscapedHyphen(){
+        Song s = readSong("test_abc/body_lyrics_escaped_hyphen.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "-abc-def");
+        assertEquals(bars.get(1).getLyrics().size(), 0);
+        assertEquals(bars.get(2).getLyrics().size(), 0);
+    }
+
+
+    /**
+     * Test lyrics containing a double hyphen.
+     */
+    @Test
+    public void testBodyLyricsDoubleHyphen(){
+        Song s = readSong("test_abc/body_lyrics_double_hyphen.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "-");
+        assertEquals(bars.get(2).getLyrics().size(), 1);
+        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test lyrics containing a hyphen followed by an underscore.
+     */
+    @Test
+    public void testBodyLyricsHyphenUnderscore(){
+        Song s = readSong("test_abc/body_lyrics_hyphen_underscore.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(bars.size(), 3);
+        assertEquals(bars.get(0).getLyrics().size(), 1);
+        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
+        assertEquals(bars.get(1).getLyrics().size(), 1);
+        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
+        assertEquals(bars.get(2).getLyrics().size(), 1);
+        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+    }
+
+
+    /**
+     * Test that the voice definitions in the header are parsed.
+     */
+    @Test
+    public void testHeaderVoices(){
+        Song s = readSong("test_abc/header_voices.abc");
+        assertEquals(s.listVoices().size(), 3);
+        assertTrue(s.listVoices().contains(" upper"));
+        assertTrue(s.listVoices().contains("middle"));
+        assertTrue(s.listVoices().contains("lower"));
+    }
+
+
+    /**
+     * Test that the voices in the body are parsed properly.
+     */
+    @Test
+    public void testBodyVoices(){
+        Song s = readSong("test_abc/body_voices.abc");
+        List<Bar> v1 = s.getBars(new Voice(" upper"));
+        List<Bar> v2 = s.getBars(new Voice("lower"));
+
+        List<Bar> expected_v1 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)))),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(B)),
+                            new Duration(1,1)))));
+
+        List<Bar> expected_v2 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(C)),
+                            new Duration(1,1))),
+                    Arrays.asList(
+                        new Lyric("moo"))),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(D)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.NONE,
+                    BarSuffix.END_REPEAT));
+
+        assertEquals(v1, expected_v1);
+        assertEquals(v2, expected_v2);
+    }
+
+
+    /**
+     * Should throw error for invalid bar repeat sequences.
+     *
+     * For example:
+     *      a '|:' without a closing ':|' or a closing ':|[2'
+     *      two '|:' in a row that are not separated by a ':|' or a ':|[2' (same as first case)
+     *      two ':|' in a row that are not separated by a '|:' or a '|]'
+     *      a '|[1' not followed by a ':|[2'
+     *      a ':|[2' not preceded by a '|[1'
+     */
+    @Test
+    public void testBodyInvalidRepeat(){
+        File basedir = new File("test_abc/body_invalid_repeat");
+        for (File file: basedir.listFiles()){
+            shouldFailToParse(file.getPath());
+        }
+    }
+
+
+    /**
+     * Should not throw errors for valid bar repeat sequences.
+     *
+     * For example:
+     *      two '|:' in a row separated by a ':|' 
+     *      two '|:' in a row separated by a ':|[2'
+     *      two ':|' in a row separated by a '|:'
+     *      two ':|' in a row separated by a '|]'
+     *      a '|[1' followed by a ':|[2' followed by an empty bar
+     */
+    @Test
+    public void testBodyValidRepeat(){
+        File basedir = new File("test_abc/body_valid_repeat");
+        for (File file: basedir.listFiles()){
+            readSong(file.getPath());
+        }
     }
 
 
