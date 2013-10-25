@@ -207,7 +207,8 @@ public class SongParserTest {
 
 
     /**
-     * Should correctly parse durations.
+     * Should correctly parse durations, and not complain
+     * about bar lengths that don't fit the meter.
      *
      * Valid Durations: "" "/m" "n" "n/m"
      *
@@ -720,6 +721,44 @@ public class SongParserTest {
 
         assertEquals(v1, expected_v1);
         assertEquals(v2, expected_v2);
+    }
+
+
+    /**
+     * Should throw error for invalid bar repeat sequences.
+     *
+     * For example:
+     *      a '|:' without a closing ':|' or a closing ':|[2'
+     *      two '|:' in a row that are not separated by a ':|' or a ':|[2' (same as first case)
+     *      two ':|' in a row that are not separated by a '|:' or a '|]'
+     *      a '|[1' not followed by a ':|[2'
+     *      a ':|[2' not preceeded by a '|[1'
+     */
+    @Test
+    public void testBodyInvalidRepeat(){
+        File basedir = new File("test_abc/body_invalid_repeat");
+        for (File file: basedir.listFiles()){
+            shouldFailToParse(file.getPath());
+        }
+    }
+
+
+    /**
+     * Should not throw errors for valid bar repeat sequences.
+     *
+     * For example:
+     *      two '|:' in a row separated by a ':|' 
+     *      two '|:' in a row separated by a ':|[2'
+     *      two ':|' in a row separated by a '|:'
+     *      two ':|' in a row separated by a '|]'
+     *      a '|[1' followed by a ':|[2' followed by an empty bar
+     */
+    @Test
+    public void testBodyValidRepeat(){
+        File basedir = new File("test_abc/body_valid_repeat");
+        for (File file: basedir.listFiles()){
+            readSong(file.getPath());
+        }
     }
 
 
