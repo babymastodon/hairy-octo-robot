@@ -45,7 +45,7 @@ package grammar;
  */
 WHITESPACE : ('\t' | ' ')+ ;
 DIGIT: [0-9]+;
-WORD: [a-zA-Z!.?]+;
+WORD: [a-zA-Z!.?']+;
 LINEFEED: (('\n')+ | ('\r\n')+);
 
 /*
@@ -60,11 +60,11 @@ LINEFEED: (('\n')+ | ('\r\n')+);
  * http://www.antlr.org/wiki/display/ANTLR4/Parser+Rules#ParserRules-StartRulesandEOF
  */
 abctune : abcheader abcmusic EOF;
-abcheader : fieldnumber comment* fieldtitle otherfields* fieldkey;
-fieldnumber : 'X:' (' '+ | DIGIT)+ endofline;
+abcheader : LINEFEED* fieldnumber LINEFEED* comment* LINEFEED* fieldtitle LINEFEED* otherfields* LINEFEED* fieldkey LINEFEED*;
+fieldnumber : 'X:' ' '* DIGIT ' '* endofline;
 fieldtitle : 'T:' ' '* fieldtitletext ' '* endofline;
 fieldtitletext : (' '+ | text | DIGIT | (space* DIGIT space*))+;
-otherfields : fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice | comment;
+otherfields : fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice | comment | LINEFEED;
 fieldcomposer : 'C:' ' '* composername ' '* endofline;
 composername: (' '+ | text)+;
 fielddefaultlength : 'L:' ' '* notelengthstrict ' '* endofline;
@@ -80,7 +80,7 @@ meter : 'C' | 'C|' | meterfraction;
 meterfraction : DIGIT+ '/' DIGIT+;
 tempo : meterfraction '=' DIGIT+;
 abcmusic : abcline+;
-abcline :  notesline (lyric LINEFEED*)* | midtunefield | comment;
+abcline :  notesline (lyric LINEFEED*)* | midtunefield | comment | LINEFEED;
 notesline : element+ LINEFEED;
 //abcline : element+ LINEFEED | midtunefield | comment;
 element : noteelement | tupletelement | barline | nthrepeat | ' ' ;

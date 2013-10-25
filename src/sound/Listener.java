@@ -161,7 +161,7 @@ public class Listener extends ABCMusicBaseListener {
 
 	@Override
 	public void enterFieldnumber(ABCMusicParser.FieldnumberContext ctx) {
-		index = Integer.parseInt(ctx.DIGIT().get(0).toString());
+		index = Integer.parseInt(ctx.DIGIT().toString());
 		System.out.println("Index: " + index);
 
 	}
