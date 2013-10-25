@@ -667,6 +667,62 @@ public class SongParserTest {
     }
 
 
+    /**
+     * Test that the voice definitions in the header are parsed.
+     */
+    @Test
+    public void testHeaderVoices(){
+        Song s = readSong("test_abc/header_voices.abc");
+        assertEquals(s.listVoices().size(), 3);
+        assertTrue(s.listVoices().contains(" upper"));
+        assertTrue(s.listVoices().contains("middle"));
+        assertTrue(s.listVoices().contains("lower"));
+    }
+
+
+    /**
+     * Test that the voices in the body are parsed properly.
+     */
+    @Test
+    public void testBodyVoices(){
+        Song s = readSong("test_abc/body_voices.abc");
+        List<Bar> v1 = s.getBars(new Voice(" upper"));
+        List<Bar> v2 = s.getBars(new Voice("lower"));
+
+        List<Bar> expected_v1 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)))),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(B)),
+                            new Duration(1,1)))));
+
+        List<Bar> expected_v2 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(C)),
+                            new Duration(1,1))),
+                    Arrays.asList(
+                        new Lyric("moo"))),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(D)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.NONE,
+                    BarSuffix.END_REPEAT));
+
+        assertEquals(v1, expected_v1);
+        assertEquals(v2, expected_v2);
+    }
+
+
     private void shouldFailToParse(String path){
         try{
             readSong(path);
