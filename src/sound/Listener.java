@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 public class Listener extends ABCMusicBaseListener {
@@ -82,7 +84,6 @@ public class Listener extends ABCMusicBaseListener {
 	public void enterNote(ABCMusicParser.NoteContext ctx) {
 		int durationNumerator = 1;
 		int durationDenominator = 1;
-		Duration duration = new Duration(durationNumerator,durationDenominator);
 		if (ctx.notelength().isEmpty()==false){
 			if(ctx.notelength().getText().matches("[0-9]++/[0-9]++")){
 				durationNumerator = Integer.parseInt(ctx.notelength().DIGIT().get(0).getText());
@@ -132,9 +133,11 @@ public class Listener extends ABCMusicBaseListener {
 					octave = -1;
 				}
 			}
+			Duration duration = new Duration(durationNumerator,durationDenominator);
 			Pitch pitch = new Pitch(letter,accidental,octave);
 			Sound sound = new Sound(pitch);
 			SoundEvent note = new SoundEvent(sound,duration);
+			System.out.println(note.getDuration().getNumerator() + " " + note.getDuration().getDenominator());
 			currentNoteList.add(note);
 			//System.out.println("letter: " + letter + "; accidental: " + accidental + "; octave: " + octave + " ;num: " + durationNumerator + " ;denom: " + durationDenominator);
 		}
@@ -164,9 +167,12 @@ public class Listener extends ABCMusicBaseListener {
 	public void enterBarline(ABCMusicParser.BarlineContext ctx) {
 		String barString = ctx.getText();
 		switch (barString){
+			case "|]":
 			case "|":
 				Bar bar  = new Bar(currentNoteList);
 				barList.add(bar);
+				currentNoteList = new ArrayList<SoundEvent>();
+				break;
 		}
 	}
 
@@ -226,6 +232,20 @@ public class Listener extends ABCMusicBaseListener {
 		if (barList.isEmpty()==false){
 			barMap.put(currentVoice,barList);
 			System.out.println("Voice and bars mapped." + barMap.keySet());
+		}
+		if (defaultDuration==null){ // (L) meter<0.75 default note length is
+		// sixteenth note
+		// meter>=.75, it is an eighth note
+			float meter = meterNumerator/(float)meterDenominator;
+			if (meter<.75) {
+				defaultDuration = new Duration(1,16);
+			}
+			else if (meter>=.75){
+				defaultDuration = new Duration(1,8);
+			}
+		}
+		if (beatDuration==null){// (L): defaultDuration unless specified
+			beatDuration = defaultDuration;
 		}
 		song = new Song( barMap, index, title,
                 composer, meterNumerator, meterDenominator, 
