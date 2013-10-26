@@ -117,7 +117,7 @@ public class SongConverter {
     
     private PlayableSong convert(int gcd, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
-        //TODO: handle lyrics
+
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
         int ticksPerBeat = gcd;
         
