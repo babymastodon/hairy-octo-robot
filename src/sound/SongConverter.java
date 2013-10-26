@@ -131,7 +131,7 @@ public class SongConverter {
            
             for(Bar currentBar: barsForVoice){
                 List<SoundEvent> soundEventsList = currentBar.getEvents();
-                List<Lyric> lyricsForBar = currentBar.getLyrics();
+                List<Lyric> lyricsForBar = new ArrayList<Lyric>(currentBar.getLyrics());
                                            
                 for(SoundEvent soundEvent : soundEventsList){
                     int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
