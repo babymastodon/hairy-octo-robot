@@ -20,7 +20,6 @@ public class SongPlayer {
      * @param song the song to be played
      * @param listener the lyric listener that is to recieve the lyrics
      */
-    //TODO: handle LyricListener
     public SongPlayer(PlayableSong song){
         this.song = song;
     }
