@@ -11,14 +11,26 @@ public class SongConverter {
     private final Song song;
 
     
-    
+    /**
+     * Constructs a new SongConverter object.
+     * 
+     * @param song The Song to be converted
+     */
     public SongConverter(Song song){
         this.song = song;
     }
     
     
     
-    private Song fillInAccidentals(){
+    /**
+     * Distribute the accidentals of the Song used to construct
+     * the SongConverter object according
+     * to the rules of key signatures and accidentals in bars.
+     * 
+     * @return  A new Song that is the same as the song used to construct
+     *          the SongConverter object, but with the accidentals distributed.
+     */
+    private Song distributeInAccidentals(){
         List<Voice> voicesList = song.listVoices();
         Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
       
@@ -76,6 +88,15 @@ public class SongConverter {
 
     
     
+    /**
+     * Returns the number of ticks per default beat of a Song needed
+     * to that are necessary to represent all the lengths of notes that 
+     * appear in a piece as ticks.
+     * 
+     * @param song The song object that the number of ticks per beat should
+     *        be calculated for.
+     * @return The number of ticks per beat
+     */
     private int calcTicksPerBeat(Song song){
         List<Voice> voicesList = song.listVoices();
         Set<Integer> setOfDenominators = new TreeSet<Integer>();
@@ -108,18 +129,32 @@ public class SongConverter {
     
     
     
+    /**
+     * Calculates the GCD of two numbers.
+     * 
+     * @param a the first number
+     * @param b the second number
+     * @return the GCD of the two
+     */
     private int GCD(int a, int b) {
+        // using Euclid's algorithm 
+        // (http://en.wikipedia.org/wiki/Euclidean_algorithm#Implementations)
         if (b == 0) return (a);
         else return (GCD (b, a % b));
     }
     
     
     
-    private PlayableSong convert(int gcd, Song songAccidentals){
+    /**
+     * Converts a Song to a PlayableSong.
+     * 
+     * @param ticksPerBeat The number of ticks per default beat in the Song
+     * @param songAccidentals The Song to be converted. Requires songAccidentals 
+     *        already has its accidentals correctly applied through to each individual Sound.
+     * @return A PlayableSong that represents songAccidentals.
+     */
+    private PlayableSong convert(int ticksPerBeat, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
-
-        int beatsPerMinute = songAccidentals.getBeatsPerMinute();
-        int ticksPerBeat = gcd;
         
         Map<Voice,List<PlayableSoundEvent>> newVoicesToSoundEvent = new HashMap<Voice,List<PlayableSoundEvent>>();
         
@@ -134,10 +169,13 @@ public class SongConverter {
                 List<Lyric> lyricsForBar = new ArrayList<Lyric>(currentBar.getLyrics());
                                            
                 for(SoundEvent soundEvent : soundEventsList){
-                    int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
+                    int numTicks = (soundEvent.getDuration().getNumerator()*ticksPerBeat) / soundEvent.getDuration().getDenominator();
                     boolean soundIsNotARest = soundEvent.getSound().getPitches().size() > 0;
                     boolean lyricsLeftToAdd = lyricsForBar.size() > 0;
                     
+                    // Lyrics are only added to sounds that are not rests.
+                    // When we run out of lyrics for a bar then the rest of the sounds
+                    // in that bar do not get lyrics.
                     if(soundIsNotARest && lyricsLeftToAdd){
                         Lyric lyric = lyricsForBar.remove(0);
                         playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks,lyric));
@@ -152,11 +190,21 @@ public class SongConverter {
             
         }
         
+        int beatsPerMinute = songAccidentals.getBeatsPerMinute();
         return new PlayableSong(newVoicesToSoundEvent,beatsPerMinute,ticksPerBeat);       
     }
     
     
     
+    /**
+     * Takes a List of Bars that may contain Bars that are meant
+     * to be repeated. Returns a new List of Bars where all 
+     * Bars that were meant to be repeated in the input now actually
+     * appear multiple times in the output.
+     * 
+     * @param barList The List of Bars to expand.
+     * @return The List of expanded Bars.
+     */
     private List<Bar> expandRepeats(List<Bar> barList){
         List<Bar> newBarList = new ArrayList<Bar>(barList);
         
@@ -261,9 +309,16 @@ public class SongConverter {
     
     
     
+    /**
+     * Returns the result of converting a Song object into a 
+     * PlayableSong object.
+     * 
+     * @return A PlayableSong object that represents the Song object
+     *         used to construct the SongConverter.
+     */
     public PlayableSong getResult(){
-        Song songWithFilledInAccidentals = fillInAccidentals();
-        int gcd = calcTicksPerBeat(songWithFilledInAccidentals);
-        return convert(gcd,songWithFilledInAccidentals);    
+        Song songWithFilledInAccidentals = distributeInAccidentals();
+        int ticksPerBeat = calcTicksPerBeat(songWithFilledInAccidentals);
+        return convert(ticksPerBeat,songWithFilledInAccidentals);    
     }
 }
