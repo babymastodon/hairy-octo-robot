@@ -489,7 +489,7 @@ public class SongPlayerTest {
         List<Lyric> lyrics = new ArrayList<Lyric>();
         lyrics.add(new Lyric(""));
         
-        Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.BEGIN_REPEAT,BarSuffix.NONE);
+        Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         Bar bar2 = new Bar(soundEvents2,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         Bar bar3 = new Bar(soundEvents3,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         Bar bar4 = new Bar(soundEvents4,lyrics,BarPrefix.NONE,BarSuffix.NONE);
