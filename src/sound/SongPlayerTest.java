@@ -487,7 +487,10 @@ public class SongPlayerTest {
           
         
         List<Lyric> lyrics = new ArrayList<Lyric>();
-        lyrics.add(new Lyric(""));
+        lyrics.add(new Lyric("This"));
+        lyrics.add(new Lyric("Is"));
+        lyrics.add(new Lyric("A"));
+        lyrics.add(new Lyric("Test"));
         
         Bar bar1 = new Bar(soundEvents1,lyrics,BarPrefix.NONE,BarSuffix.NONE);
         Bar bar2 = new Bar(soundEvents2,lyrics,BarPrefix.NONE,BarSuffix.NONE);

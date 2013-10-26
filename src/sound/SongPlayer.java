@@ -20,7 +20,6 @@ public class SongPlayer {
      * @param song the song to be played
      * @param listener the lyric listener that is to recieve the lyrics
      */
-    //TODO: handle LyricListener
     public SongPlayer(PlayableSong song){
         this.song = song;
     }
@@ -36,7 +35,7 @@ public class SongPlayer {
         try {
             LyricListener listener = new LyricListener() {
                 public void processLyricEvent(String text) {
-                    System.out.println(text);
+                    System.out.print(text + " ");
                 }
             };
 
@@ -46,17 +45,22 @@ public class SongPlayer {
                 int startTick = 0;
                 List<PlayableSoundEvent> playableSoundEventsList = song.getEvents(voice);
 
-                for(PlayableSoundEvent playablSoundEvent: playableSoundEventsList){
-                    Sound sound = playablSoundEvent.getSound();
+                for(PlayableSoundEvent playableSoundEvent: playableSoundEventsList){
+                    Sound sound = playableSoundEvent.getSound();
 
                     List<Pitch> pitchList = sound.getPitches();
-
-                    for(Pitch pitchOfSound : pitchList){
-                        player.addNote(pitchOfSound.toMidiNote(),startTick,playablSoundEvent.getTicks());
-                        System.out.println("ST: " + startTick + "  TL: " + playablSoundEvent.getTicks());
+                    
+                    if(playableSoundEvent.hasLyric()){
+                        String lyricAsString = playableSoundEvent.getLyric().getText();
+                        player.addLyricEvent(lyricAsString,startTick);
                     }
 
-                    startTick += playablSoundEvent.getTicks();
+                    for(Pitch pitchOfSound : pitchList){
+                        player.addNote(pitchOfSound.toMidiNote(),startTick,playableSoundEvent.getTicks());
+                        //System.out.println("ST: " + startTick + "  TL: " + playableSoundEvent.getTicks());
+                    }
+
+                    startTick += playableSoundEvent.getTicks();
                 }
             }
 
