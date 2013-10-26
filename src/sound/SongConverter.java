@@ -131,10 +131,20 @@ public class SongConverter {
            
             for(Bar currentBar: barsForVoice){
                 List<SoundEvent> soundEventsList = currentBar.getEvents();
+                List<Lyric> lyricsForBar = currentBar.getLyrics();
                                            
                 for(SoundEvent soundEvent : soundEventsList){
                     int numTicks = (soundEvent.getDuration().getNumerator()*gcd) / soundEvent.getDuration().getDenominator();
-                    playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
+                    boolean soundIsNotARest = soundEvent.getSound().getPitches().size() > 0;
+                    boolean lyricsLeftToAdd = lyricsForBar.size() > 0;
+                    
+                    if(soundIsNotARest && lyricsLeftToAdd){
+                        Lyric lyric = lyricsForBar.remove(0);
+                        playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks,lyric));
+                    }
+                    else{
+                        playableSoundEventList.add(new PlayableSoundEvent(soundEvent.getSound(),numTicks));
+                    }
                 }
             }
             
