@@ -31,26 +31,30 @@ public class SongConverter {
      *          the SongConverter object, but with the accidentals distributed.
      */
     private Song distributeInAccidentals(){
-        List<Voice> voicesList = song.listVoices();
         Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
       
-        for(Voice voice : voicesList){
-            List<Bar> barsForVoice = song.getBars(voice);
+        for(Voice voice : song.listVoices()){
             List<Bar> newBarsForVoice = new ArrayList<Bar>();
 
-            for(Bar bar : barsForVoice){
-                List<SoundEvent> soundEventsList = bar.getEvents();
+            for(Bar bar : song.getBars(voice)){
+                // a mapping from letters to accidentals within
+                // the context of the current bar
                 Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
+
+                // at the beginning of the bar, initialize the mapping
+                // to the key signature
+                for (Letter letter: Letter.values()){
+                    letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
+                }
+
                 List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
 
-                for(SoundEvent soundEventInBar : soundEventsList){
-                    Sound sound = soundEventInBar.getSound();
-                    List<Pitch> pitchList = sound.getPitches();
+
+                for(SoundEvent soundEventInBar : bar.getEvents()){
                     List<Pitch> newPitchList = new ArrayList<Pitch>();
 
-                    for(Pitch pitchOfSound : pitchList){
+                    for(Pitch pitchOfSound : soundEventInBar.getSound().getPitches()){
                         Letter letter = pitchOfSound.getLetter();
-                        letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
                         Accidental accidentalOfSound = pitchOfSound.getAccidental();
 
                         // When there is no accidental on a note then the key signature
