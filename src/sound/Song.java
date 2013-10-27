@@ -61,10 +61,7 @@ public class Song {
         
         while(iteratorOfKeys.hasNext()){
             Voice voiceKey = iteratorOfKeys.next();
-            List<Bar> correspondingBarList;
-           
-            correspondingBarList = (ArrayList<Bar>) ((ArrayList<Bar>)barLists.get(voiceKey)).clone();
-            
+            List<Bar> correspondingBarList = new ArrayList<Bar>(barLists.get(voiceKey));;            
             this.barLists.put(voiceKey, correspondingBarList);
         }
         
