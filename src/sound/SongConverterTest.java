@@ -28,8 +28,8 @@ public class SongConverterTest {
         // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
-        assertEquals(output.size(), 1);
-        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(1, output.size());
+        assertEquals(1, output.get(0).getSound().getPitches().size());
         assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
     }
 
@@ -53,10 +53,10 @@ public class SongConverterTest {
         // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
-        assertEquals(output.size(), 2);
-        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(2, output.size());
+        assertEquals(1, output.get(0).getSound().getPitches().size());
         assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(1).getSound().getPitches().size(), 1);
+        assertEquals(1, output.get(1).getSound().getPitches().size());
         assertEquals(NATURAL, output.get(1).getSound().getPitches().get(0).getAccidental());
     }
 
@@ -81,12 +81,12 @@ public class SongConverterTest {
         // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
-        assertEquals(output.size(), 3);
-        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(3, output.size());
+        assertEquals(1, output.get(0).getSound().getPitches().size());
         assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(1).getSound().getPitches().size(), 1);
+        assertEquals(1, output.get(1).getSound().getPitches().size());
         assertEquals(SHARP, output.get(1).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(2).getSound().getPitches().size(), 1);
+        assertEquals(1, output.get(2).getSound().getPitches().size());
         assertEquals(SHARP, output.get(2).getSound().getPitches().get(0).getAccidental());
     }
 
@@ -111,12 +111,12 @@ public class SongConverterTest {
         // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
-        assertEquals(output.size(), 3);
-        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(3, output.size());
+        assertEquals(1, output.get(0).getSound().getPitches().size());
         assertEquals(FLAT, output.get(0).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(1).getSound().getPitches().size(), 1);
+        assertEquals(1, output.get(1).getSound().getPitches().size());
         assertEquals(NATURAL, output.get(1).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(2).getSound().getPitches().size(), 1);
+        assertEquals(1, output.get(2).getSound().getPitches().size());
         assertEquals(NATURAL, output.get(2).getSound().getPitches().get(0).getAccidental());
     }
 
@@ -140,13 +140,86 @@ public class SongConverterTest {
         // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
-        assertEquals(output.size(), 2);
-        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(2, output.size());
+        assertEquals(1, output.get(0).getSound().getPitches().size());
         assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(1).getSound().getPitches().size(), 2);
+        assertEquals(2, output.get(1).getSound().getPitches().size());
         assertEquals(SHARP, output.get(1).getSound().getPitches().get(0).getAccidental());
-        assertEquals(output.get(1).getSound().getPitches().size(), 2);
+        assertEquals(2, output.get(1).getSound().getPitches().size());
         assertEquals(SHARP, output.get(1).getSound().getPitches().get(1).getAccidental());
+    }
+
+
+    /**
+     * Simple bar repitition should work.
+     */
+    @Test
+    public void testSingleRepitition() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.BEGIN_REPEAT,
+                    BarSuffix.END_REPEAT));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(2, output.size());
+    }
+
+
+    /**
+     * Should repeat from beginning if no BEGIN_REPEAT
+     * is provided.
+     */
+    @Test
+    public void testRepeatFromBeginning() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.NONE,
+                    BarSuffix.END_REPEAT));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(2, output.size());
+    }
+
+
+    /**
+     * Should repeat from beginning of last major section
+     * if no BEGIN_REPEAT is provided.
+     */
+    @Test
+    public void testRepeatFromMajorSection() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.NONE,
+                    BarSuffix.END_SECTION),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.NONE,
+                    BarSuffix.END_REPEAT));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(3, output.size());
     }
 
     private Song makeTestSong(List<Bar> bars){
