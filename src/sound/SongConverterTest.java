@@ -57,7 +57,7 @@ public class SongConverterTest {
         assertEquals(output.get(0).getSound().getPitches().size(), 1);
         assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
         assertEquals(output.get(1).getSound().getPitches().size(), 1);
-        assertTrue(SHARP != output.get(1).getSound().getPitches().get(0).getAccidental());
+        assertEquals(NATURAL, output.get(1).getSound().getPitches().get(0).getAccidental());
     }
 
 
@@ -88,6 +88,65 @@ public class SongConverterTest {
         assertEquals(SHARP, output.get(1).getSound().getPitches().get(0).getAccidental());
         assertEquals(output.get(2).getSound().getPitches().size(), 1);
         assertEquals(SHARP, output.get(2).getSound().getPitches().get(0).getAccidental());
+    }
+
+
+    /**
+     * Accidentals within the same bar should override each other.
+     */
+    @Test
+    public void testAccidentalsOverrideEachOther() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A, FLAT)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A, NATURAL)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)))));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(output.size(), 3);
+        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(FLAT, output.get(0).getSound().getPitches().get(0).getAccidental());
+        assertEquals(output.get(1).getSound().getPitches().size(), 1);
+        assertEquals(NATURAL, output.get(1).getSound().getPitches().get(0).getAccidental());
+        assertEquals(output.get(2).getSound().getPitches().size(), 1);
+        assertEquals(NATURAL, output.get(2).getSound().getPitches().get(0).getAccidental());
+    }
+
+
+    /**
+     * Notes in chords should have accidentals filled in.
+     */
+    @Test
+    public void testAccidentalsInChords() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A, SHARP)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(Arrays.asList(
+                                    new Pitch(A),
+                                    new Pitch(C))),
+                            new Duration(1,1)))));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(output.size(), 2);
+        assertEquals(output.get(0).getSound().getPitches().size(), 1);
+        assertEquals(SHARP, output.get(0).getSound().getPitches().get(0).getAccidental());
+        assertEquals(output.get(1).getSound().getPitches().size(), 2);
+        assertEquals(SHARP, output.get(1).getSound().getPitches().get(0).getAccidental());
+        assertEquals(output.get(1).getSound().getPitches().size(), 2);
+        assertEquals(SHARP, output.get(1).getSound().getPitches().get(1).getAccidental());
     }
 
     private Song makeTestSong(List<Bar> bars){

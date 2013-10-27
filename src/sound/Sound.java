@@ -74,6 +74,7 @@ public class Sound {
         if (obj.getClass() != this.getClass())
             return false;
         Sound that = (Sound) obj;
+        // TODO: equality should not depend on order of pitches
         return this.pitch_list.equals(that.getPitches());
     }
 
