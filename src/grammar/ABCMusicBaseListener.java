@@ -117,9 +117,6 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 	@Override public void enterNotelength(ABCMusicParser.NotelengthContext ctx) { }
 	@Override public void exitNotelength(ABCMusicParser.NotelengthContext ctx) { }
 
-	@Override public void enterNthrepeat(ABCMusicParser.NthrepeatContext ctx) { }
-	@Override public void exitNthrepeat(ABCMusicParser.NthrepeatContext ctx) { }
-
 	@Override public void enterFieldkey(ABCMusicParser.FieldkeyContext ctx) { }
 	@Override public void exitFieldkey(ABCMusicParser.FieldkeyContext ctx) { }
 

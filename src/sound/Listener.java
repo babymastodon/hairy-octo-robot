@@ -12,10 +12,8 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 public class Listener extends ABCMusicBaseListener {
-	// TODO: Construct map
-	// TODO: getSong() & set Duration objects to appropriate defaults before
-	// TODO: grammar breaks on "b" for flat in K: field.
-	// creating Song object
+	// TODO: breaks on "b" for flat in K: field. handle WORD scenario for field
+	//Song Params
 	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>();
 	private Song song;
 	private int index; // req of abc files
@@ -29,11 +27,20 @@ public class Listener extends ABCMusicBaseListener {
 	private KeySignature keySignature; // req of abc files
 	private Duration beatDuration; // (L): defaultDuration unless specified
 	private int beatsPerMinute = 100; // default 100
+	
+	//Things to keep track of:
 	private Voice currentVoice = new Voice(); //keeps track of applicable voice -- set up with default voice
 	private ArrayList<Bar> barList = new ArrayList<Bar>(); //current list of bars
 	private ArrayList<SoundEvent> currentNoteList = new ArrayList<SoundEvent>(); //Store sounds for current bar in
-
-
+	private boolean inMultinote = false;
+	private ArrayList<Pitch> multinoteList = new ArrayList<Pitch>();
+	private Duration multinoteDuration;
+	private boolean inTuplet = false;
+	private Duration tupletMultiplier; //duration to alter tuplet note durations
+	private int tupletCount = 0; //counts tuplet notes observed
+	//Bar booleans
+	Boolean endRepeat, endSection, noSuff = false; //suffixes
+	Boolean firstEnding, secondEnding, beginRepeat, beginSection, noPre = false; //prefixes
 
 	@Override
 	public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) {
@@ -100,7 +107,7 @@ public class Listener extends ABCMusicBaseListener {
 				durationNumerator = Integer.parseInt(ctx.notelength().DIGIT().get(0).getText());
 			}
 		}
-		if (ctx.noteorrest().pitch().basenote().isEmpty()==false){ //if pitch
+		if (ctx.noteorrest().pitch()!=null){ //if pitch
 			char noteChar = ctx.noteorrest().pitch().basenote().getText().charAt(0);
 			int octave = 0;
 			if(Character.isLowerCase(noteChar)){
@@ -139,17 +146,85 @@ public class Listener extends ABCMusicBaseListener {
 			}
 			Duration duration = new Duration(durationNumerator,durationDenominator);
 			Pitch pitch = new Pitch(letter,accidental,octave);
-			Sound sound = new Sound(pitch);
-			SoundEvent note = new SoundEvent(sound,duration);
-			//System.out.println(note.getDuration().getNumerator() + " " + note.getDuration().getDenominator());
-			currentNoteList.add(note);
+			if (inTuplet){
+				duration = duration.mul(tupletMultiplier);
+				tupletCount +=1;
+			}
+			if (inMultinote){
+				if (multinoteList.size()==0){
+					multinoteDuration = duration;
+				}
+				multinoteList.add(pitch);
+				// TODO : handle when duration is longer than first of chord (multinoteDuration)
+			}
+			else{
+				Sound sound = new Sound(pitch);
+				SoundEvent note = new SoundEvent(sound,duration);
+				currentNoteList.add(note);
+			}
 			System.out.println("letter: " + letter + "; accidental: " + accidental + "; octave: " + octave + " ;num: " + durationNumerator + " ;denom: " + durationDenominator);
+		}
+		else{ //if rest
+			if (inMultinote){}
+			else{
+				Duration duration = new Duration(durationNumerator,durationDenominator); 
+				if (inTuplet){
+					duration = duration.mul(tupletMultiplier);
+					tupletCount +=1;
+				}
+				Sound sound = new Sound();
+				SoundEvent rest = new SoundEvent(sound,duration);
+				currentNoteList.add(rest);
+			}
 		}
 	}
 
 	@Override
 	public void enterMultinote(ABCMusicParser.MultinoteContext ctx) {
+		inMultinote = true;
+	}
 
+	@Override
+	public void exitMultinote(ABCMusicParser.MultinoteContext ctx) {
+		inMultinote = false;
+		Sound sound = new Sound(multinoteList);
+		SoundEvent chord = new SoundEvent(sound,multinoteDuration);
+		currentNoteList.add(chord);
+	}
+
+	@Override
+	public void enterTupletelement(ABCMusicParser.TupletelementContext ctx) {
+		inTuplet = true;
+		String specString = ctx.tupletspec().getText();
+		switch (specString){
+		case "(2":
+			tupletMultiplier = new Duration(3,2);
+			break;
+		case "(3":
+			tupletMultiplier = new Duration(2,3);
+			break;
+		case "(4":
+			tupletMultiplier = new Duration(3,4);
+			break;
+		}
+	}
+
+	@Override
+	public void exitTupletelement(ABCMusicParser.TupletelementContext ctx) {
+		inTuplet = false;
+		String specString = ctx.tupletspec().getText();
+		switch (specString){
+		case "(2":
+			if(tupletCount!=2){throw new RuntimeException("A tuplet has wrong size.");}
+			break;
+		case "(3":
+			if(tupletCount!=3){throw new RuntimeException("A tuplet has wrong size.");}
+			break;
+		case "(4":
+			if(tupletCount!=4){throw new RuntimeException("A tuplet has wrong size.");}
+			break;
+		}
+		tupletCount = 0;
 	}
 
 
@@ -170,6 +245,8 @@ public class Listener extends ABCMusicBaseListener {
 	@Override
 	public void enterBarline(ABCMusicParser.BarlineContext ctx) {
 		String barString = ctx.getText();
+		// END_REPEAT, END_SECTION, NONE; suffix
+		// FIRST_ENDING, SECOND_ENDING, BEGIN_REPEAT, BEGIN_SECTION, NONE; prefix
 		switch (barString){
 		case "|]":
 		case "|":
@@ -184,9 +261,6 @@ public class Listener extends ABCMusicBaseListener {
 	public void enterLyric(ABCMusicParser.LyricContext ctx) {
 	}
 
-	@Override
-	public void enterNthrepeat(ABCMusicParser.NthrepeatContext ctx) {
-	}
 
 	@Override
 	public void enterFieldkey(ABCMusicParser.FieldkeyContext ctx) {
@@ -215,11 +289,6 @@ public class Listener extends ABCMusicBaseListener {
 
 
 	@Override
-	public void enterTupletelement(ABCMusicParser.TupletelementContext ctx) {
-
-	}
-
-	@Override
 	public void enterFielddefaultlength(
 			ABCMusicParser.FielddefaultlengthContext ctx) {
 		int numerator = Integer.parseInt(ctx.notelengthstrict().DIGIT().get(0)
@@ -232,7 +301,8 @@ public class Listener extends ABCMusicBaseListener {
 				+ defaultDuration.getDenominator());
 	}
 
-	@Override public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
+	@Override 
+	public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
 		if (barList.isEmpty()==false){
 			barMap.put(currentVoice,barList);
 			System.out.println("Voice and bars mapped." + barMap.keySet());

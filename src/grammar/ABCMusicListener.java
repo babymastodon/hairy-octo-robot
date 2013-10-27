@@ -114,9 +114,6 @@ public interface ABCMusicListener extends ParseTreeListener {
 	void enterNotelength(ABCMusicParser.NotelengthContext ctx);
 	void exitNotelength(ABCMusicParser.NotelengthContext ctx);
 
-	void enterNthrepeat(ABCMusicParser.NthrepeatContext ctx);
-	void exitNthrepeat(ABCMusicParser.NthrepeatContext ctx);
-
 	void enterFieldkey(ABCMusicParser.FieldkeyContext ctx);
 	void exitFieldkey(ABCMusicParser.FieldkeyContext ctx);
 
