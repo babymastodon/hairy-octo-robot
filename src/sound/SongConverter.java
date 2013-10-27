@@ -103,25 +103,18 @@ public class SongConverter {
         setOfDenominators.add(song.getBeatDuration().getDenominator());
         
         for(Voice voice: voicesList){
-            List<Bar> barsForVoice = song.getBars(voice);
-            
-            for(Bar bar: barsForVoice){
-                List<SoundEvent> soundEventsList = bar.getEvents();
-                
-                for(SoundEvent soundEvent : soundEventsList){
+            for(Bar bar: song.getBars(voice)){
+                for(SoundEvent soundEvent : bar.getEvents()){
                     setOfDenominators.add(soundEvent.getDuration().mul(song.getDefaultDuration()).getDenominator());
                 }
             }
         }
         
-        Integer[] a = new Integer[1];
-        Integer[] denominatorsArray = setOfDenominators.toArray(a);
-        Integer previousLCM = (denominatorsArray[0]*denominatorsArray[1]) / GCD(denominatorsArray[0],denominatorsArray[1]);
-        int lcm = previousLCM;
+        Integer[] denominatorsArray = setOfDenominators.toArray(new Integer[0]);
+        Integer lcm = denominatorsArray[0];
         
-        for(int i=2; i < denominatorsArray.length-1; i++){
-            lcm = (previousLCM*denominatorsArray[i]) / GCD(previousLCM,denominatorsArray[i]);
-            previousLCM = lcm;
+        for(int i=1; i < denominatorsArray.length; i++){
+            lcm = (lcm*denominatorsArray[i]) / GCD(lcm,denominatorsArray[i]);
         }
         
         return lcm;     

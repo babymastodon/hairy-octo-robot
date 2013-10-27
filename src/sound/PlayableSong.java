@@ -43,8 +43,10 @@ public class PlayableSong {
         
         while(iteratorOfKeys.hasNext()){
             Voice voiceKey = iteratorOfKeys.next();
-            List<PlayableSoundEvent> soundEventListToBeCopied = eventMap.get(voiceKey);
-            List<PlayableSoundEvent> soundEventList = new ArrayList<PlayableSoundEvent>(soundEventListToBeCopied);
+
+            List<PlayableSoundEvent> soundEventList = 
+                new ArrayList<PlayableSoundEvent>(eventMap.get(voiceKey));
+
             this.voiceToEvents.put(voiceKey, soundEventList);
         }
         
