@@ -31,26 +31,30 @@ public class SongConverter {
      *          the SongConverter object, but with the accidentals distributed.
      */
     private Song distributeInAccidentals(){
-        List<Voice> voicesList = song.listVoices();
         Map<Voice, List<Bar>> newVoicesToBars = new HashMap<Voice,List<Bar>>();
       
-        for(Voice voice : voicesList){
-            List<Bar> barsForVoice = song.getBars(voice);
+        for(Voice voice : song.listVoices()){
             List<Bar> newBarsForVoice = new ArrayList<Bar>();
 
-            for(Bar bar : barsForVoice){
-                List<SoundEvent> soundEventsList = bar.getEvents();
+            for(Bar bar : song.getBars(voice)){
+                // a mapping from letters to accidentals within
+                // the context of the current bar
                 Map<Letter, Accidental> letterToAccidental = new HashMap<Letter,Accidental>();
+
+                // at the beginning of the bar, initialize the mapping
+                // to the key signature
+                for (Letter letter: Letter.values()){
+                    letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
+                }
+
                 List<SoundEvent> newSoundEventsList = new ArrayList<SoundEvent>();
 
-                for(SoundEvent soundEventInBar : soundEventsList){
-                    Sound sound = soundEventInBar.getSound();
-                    List<Pitch> pitchList = sound.getPitches();
+
+                for(SoundEvent soundEventInBar : bar.getEvents()){
                     List<Pitch> newPitchList = new ArrayList<Pitch>();
 
-                    for(Pitch pitchOfSound : pitchList){
+                    for(Pitch pitchOfSound : soundEventInBar.getSound().getPitches()){
                         Letter letter = pitchOfSound.getLetter();
-                        letterToAccidental.put(letter, song.getKeySignature().getAccidental(letter));
                         Accidental accidentalOfSound = pitchOfSound.getAccidental();
 
                         // When there is no accidental on a note then the key signature
@@ -103,25 +107,18 @@ public class SongConverter {
         setOfDenominators.add(song.getBeatDuration().getDenominator());
         
         for(Voice voice: voicesList){
-            List<Bar> barsForVoice = song.getBars(voice);
-            
-            for(Bar bar: barsForVoice){
-                List<SoundEvent> soundEventsList = bar.getEvents();
-                
-                for(SoundEvent soundEvent : soundEventsList){
+            for(Bar bar: song.getBars(voice)){
+                for(SoundEvent soundEvent : bar.getEvents()){
                     setOfDenominators.add(soundEvent.getDuration().mul(song.getDefaultDuration()).getDenominator());
                 }
             }
         }
         
-        Integer[] a = new Integer[1];
-        Integer[] denominatorsArray = setOfDenominators.toArray(a);
-        Integer previousLCM = (denominatorsArray[0]*denominatorsArray[1]) / GCD(denominatorsArray[0],denominatorsArray[1]);
-        int lcm = previousLCM;
+        Integer[] denominatorsArray = setOfDenominators.toArray(new Integer[0]);
+        Integer lcm = denominatorsArray[0];
         
-        for(int i=2; i < denominatorsArray.length-1; i++){
-            lcm = (previousLCM*denominatorsArray[i]) / GCD(previousLCM,denominatorsArray[i]);
-            previousLCM = lcm;
+        for(int i=1; i < denominatorsArray.length; i++){
+            lcm = (lcm*denominatorsArray[i]) / GCD(lcm,denominatorsArray[i]);
         }
         
         return lcm;     

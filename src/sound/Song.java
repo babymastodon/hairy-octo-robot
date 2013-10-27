@@ -55,14 +55,10 @@ public class Song {
         
         this.barLists = new HashMap<Voice,List<Bar>>();
         
-        // below we deep copy the barLists Map
-        Set<Voice> keys = barLists.keySet();
-        Iterator<Voice> iteratorOfKeys = keys.iterator();
-        
-        while(iteratorOfKeys.hasNext()){
-            Voice voiceKey = iteratorOfKeys.next();
-            List<Bar> correspondingBarList = new ArrayList<Bar>(barLists.get(voiceKey));;            
-            this.barLists.put(voiceKey, correspondingBarList);
+        for (Voice voiceKey: barLists.keySet()){
+            this.barLists.put(
+                    voiceKey,
+                    new ArrayList<Bar>(barLists.get(voiceKey)));
         }
         
         this.index = index;
