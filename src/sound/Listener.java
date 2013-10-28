@@ -264,6 +264,7 @@ public class Listener extends ABCMusicBaseListener {
 			break;
 		case "[|":
 			beginSection = true;
+      break;
 		case "|:":
 			beginRepeat = true;
 			break;
