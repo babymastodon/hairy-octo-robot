@@ -409,6 +409,45 @@ public class SongConverterTest {
     }
 
 
+    /**
+     * Multiple voices should be handled.
+     */
+    @Test
+    public void testVoices() {
+        List<Bar> bars1 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(2,15)))));
+        List<Bar> bars2 = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(C)),
+                            new Duration(2,15)))));
+
+        Voice voice1 = new Voice("voice1");
+        Voice voice2 = new Voice("voice2");
+
+        KeySignature key = new KeySignature(A, SingleAccidental.NATURAL, true);
+        Map<Voice, List<Bar>> barmap = new HashMap<Voice, List<Bar>>();
+        barmap.put(voice1, bars1);
+        barmap.put(voice2, bars2);
+
+        Song song = new Song(barmap, 1, "Title", "Composer", 4, 4,
+                new Duration(1,7), key, new Duration(1,4), 100);
+        PlayableSong output = new SongConverter(song).getResult();
+
+        assertEquals(1, output.getEvents(voice1).size());
+        assertEquals(1, output.getEvents(voice2).size());
+        assertEquals(1, output.getEvents(voice1).get(0).getSound().getPitches().size());
+        assertEquals(1, output.getEvents(voice2).get(0).getSound().getPitches().size());
+        assertEquals(A, output.getEvents(voice1).get(0).getSound().getPitches().get(0).getLetter());
+        assertEquals(C, output.getEvents(voice2).get(0).getSound().getPitches().get(0).getLetter());
+    }
+
+
     private Song makeTestSong(List<Bar> bars){
         KeySignature key = new KeySignature(A, SingleAccidental.NATURAL, true);
         Map<Voice, List<Bar>> barmap = new HashMap<Voice, List<Bar>>();
