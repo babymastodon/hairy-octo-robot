@@ -205,37 +205,22 @@ public class SongConverter {
     private List<Bar> expandRepeats(List<Bar> barList){
         List<Bar> newBarList = new ArrayList<Bar>(barList);
         
-        List<Integer> startOfRepeats = new ArrayList<Integer>();
         Map<Integer,Integer> startIndexToEndIndex = new HashMap<Integer,Integer>();
-        List<Integer> indexOfMajorSection = new ArrayList<Integer>();
-        // the first bar counts as the beginning of major section
-        indexOfMajorSection.add(0);
-        int startVSEndRepeatCount = 0;
+        int startRepeat = 0;
         
         // build up a map that maps the index of a beginRepeat bar to the
         // corresponding index of an endRepeat bar
         for(int i = 0; i < barList.size(); i++){
             Bar currentBar = barList.get(i);
             
-            if(currentBar.getPrefix() == BarPrefix.BEGIN_SECTION){
-                indexOfMajorSection.add(i);
+            if(currentBar.getSuffix() == BarSuffix.END_SECTION){
+                startRepeat = i+1;
             }
             if(currentBar.getPrefix() == BarPrefix.BEGIN_REPEAT){
-                startVSEndRepeatCount++;
-                startOfRepeats.add(i);
-                
+                startRepeat = i;
             }
             if(currentBar.getSuffix() == BarSuffix.END_REPEAT){
-                startVSEndRepeatCount--;
-                
-                // when the count goes negative then there are more end repeats
-                // then start repeats. This means that a begin repeat was omitted
-                // and we have to repeat from the beginning of the major section.
-                if(startVSEndRepeatCount < 0){
-                    startIndexToEndIndex.put(indexOfMajorSection.remove(indexOfMajorSection.size()-1),i);
-                }else{
-                    startIndexToEndIndex.put(startOfRepeats.remove(startOfRepeats.size()-1),i);
-                }
+                startIndexToEndIndex.put(startRepeat,i);
             }
         }
               
