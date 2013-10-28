@@ -24,7 +24,7 @@ public class SongParserTest {
         Song song = readSong("sample_abc/piece1 notes.abc");
         System.out.println(song.getBars(new Voice()));
         PlayableSong playableSong = new SongConverter(song).getResult();
-        new SongPlayer(playableSong).play();
+        new SongPlayer(playableSong, new ConsoleLyricListener()).play();
     }
 
 
