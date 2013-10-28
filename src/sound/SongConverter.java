@@ -271,18 +271,6 @@ public class SongConverter {
             }
             
             newBarList.addAll(startIndex,expandedBars);
-            
-            // below we must shift the ending index of any repeated unit that we have
-            // not yet expanded if our inserting of expanded bars would change its index.
-            int differenceInSizeExpandedUnExpanded = expandedBars.size() - barsFromStartToEnd.size();
-            
-            for(int otherStartIndex : startIndicesList){
-                int otherEndIndex = startIndexToEndIndex.get(otherStartIndex);
-                
-                if(otherEndIndex > endIndex && otherStartIndex < startIndex){
-                    startIndexToEndIndex.put(otherStartIndex, otherEndIndex + differenceInSizeExpandedUnExpanded);
-                }  
-            }
                  
         }
         
