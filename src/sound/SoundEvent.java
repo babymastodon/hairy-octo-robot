@@ -71,4 +71,13 @@ public class SoundEvent {
         return sound.hashCode() + duration.hashCode();
     }
 
+    /**
+     * Return a string representation of the SoundEvent's members.
+     *
+     * @return a string
+     */
+    @Override
+    public String toString(){
+        return "SoundEvent(" + sound.toString() + ", " + duration.toString() + ")";
+    }
 }

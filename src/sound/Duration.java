@@ -117,4 +117,14 @@ public class Duration {
         return numerator * 1253 + denominator * 91;
     }
 
+
+    /**
+     * Return a string representation of the Duration's members.
+     *
+     * @return a string
+     */
+    @Override
+    public String toString(){
+        return "Duration(" + numerator + ", " + denominator + ")";
+    }
 }

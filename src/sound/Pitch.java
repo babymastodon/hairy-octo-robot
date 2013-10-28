@@ -21,7 +21,7 @@ package sound;
  * with a negative "octave" number, and higher ones are
  * indexed with a positive number.
  */
-public class Pitch {
+public class Pitch implements Comparable<Pitch> {
     private final Letter letter;
     private final Accidental accidental;
     private final int octave;
@@ -148,6 +148,28 @@ public class Pitch {
     private void checkRep(){
         assert 0 <= toMidiNote();
         assert toMidiNote() <= 127;
+    }
+
+    /**
+     * Return a string representation of the pitch's member variables.
+     *
+     * @return a string
+     */
+    @Override
+    public String toString(){
+        return "Pitch(" + letter.toString() + ", " + accidental.toString() + ", " + octave + ")";
+    }
+
+
+    /**
+     * Pitch follows a lexographic ordering based on
+     * its string representation.
+     *
+     * @return 1, -1, or 0 if other is greater than, less than, or equal
+     */
+    @Override
+    public int compareTo(Pitch other){
+        return toString().compareTo(other.toString());
     }
 
 }
