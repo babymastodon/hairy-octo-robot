@@ -773,6 +773,23 @@ public class SongParserTest {
         }
     }
 
+    /**
+     * Should not crash on valid spaces in the body.
+     *
+     * Valid octave identifiers:
+     *      lowercase/capital letters
+     *      arbitrarily long sequences of commas or apostrophes
+     *
+     */
+    @Test
+    public void testBodySpaces(){
+        Song s = readSong("test_abc/body_valid_spaces.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(2, bars.size());
+        assertEquals(2, bars.get(0).getLyrics().size());
+        assertEquals(1, bars.get(1).getLyrics().size());
+    }
+
 
     private void shouldFailToParse(String path){
         try{
