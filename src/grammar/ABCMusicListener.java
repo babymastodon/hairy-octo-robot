@@ -21,9 +21,6 @@ public interface ABCMusicListener extends ParseTreeListener {
 	void enterTempo(ABCMusicParser.TempoContext ctx);
 	void exitTempo(ABCMusicParser.TempoContext ctx);
 
-	void enterBasenote(ABCMusicParser.BasenoteContext ctx);
-	void exitBasenote(ABCMusicParser.BasenoteContext ctx);
-
 	void enterSpace(ABCMusicParser.SpaceContext ctx);
 	void exitSpace(ABCMusicParser.SpaceContext ctx);
 
@@ -125,9 +122,6 @@ public interface ABCMusicListener extends ParseTreeListener {
 
 	void enterTupletelement(ABCMusicParser.TupletelementContext ctx);
 	void exitTupletelement(ABCMusicParser.TupletelementContext ctx);
-
-	void enterRest(ABCMusicParser.RestContext ctx);
-	void exitRest(ABCMusicParser.RestContext ctx);
 
 	void enterFielddefaultlength(ABCMusicParser.FielddefaultlengthContext ctx);
 	void exitFielddefaultlength(ABCMusicParser.FielddefaultlengthContext ctx);

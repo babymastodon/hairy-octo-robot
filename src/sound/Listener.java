@@ -12,9 +12,8 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 public class Listener extends ABCMusicBaseListener {
-	// TODO: breaks on "b" for flat in K: field. handle WORD scenario for field
 	//Song Params
-	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>();
+	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>(); //barLists map
 	private Song song;
 	private int index; // req of abc files
 	private String title; // req of abc files
@@ -30,7 +29,7 @@ public class Listener extends ABCMusicBaseListener {
 	
 	//Things to keep track of:
 	private Voice currentVoice = new Voice(); //keeps track of applicable voice -- set up with default voice
-	private ArrayList<Bar> barList = new ArrayList<Bar>(); //current list of bars
+	private List<Bar> barList = new ArrayList<Bar>(); //current list of bars
 	private ArrayList<SoundEvent> currentNoteList = new ArrayList<SoundEvent>(); //Store sounds for current bar in
 	private boolean inMultinote = false;
 	private ArrayList<Pitch> multinoteList = new ArrayList<Pitch>();
@@ -39,12 +38,24 @@ public class Listener extends ABCMusicBaseListener {
 	private Duration tupletMultiplier; //duration to alter tuplet note durations
 	private int tupletCount = 0; //counts tuplet notes observed
 	//Bar booleans
-	Boolean endRepeat, endSection, noSuff = false; //suffixes
-	Boolean firstEnding, secondEnding, beginRepeat, beginSection, noPre = false; //prefixes
+	Boolean endRepeat, endSection; //suffixes
+	Boolean firstEnding, secondEnding, beginRepeat, beginSection; //prefixes
 
 	@Override
 	public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) {
-		currentVoice = new Voice(ctx.fieldvoice().text().getText());
+		if (barList.isEmpty()==false){ //assign barList if we have one before we get new voice
+			if (barMap.containsKey(currentVoice)==true){
+				List<Bar> oldBarList = barMap.get(currentVoice); //get bars previously assigned to voice
+				oldBarList.addAll(barList); //merge with current working bars
+				barMap.put(currentVoice, oldBarList); //put it back on the map
+			}
+			else{
+			barMap.put(currentVoice,barList);
+			}
+			//System.out.println("Voice and bars mapped." + barMap.keySet());
+		}
+		currentVoice = new Voice(ctx.fieldvoice().text().getText()); //new voice
+		barList = new ArrayList<Bar>(); //get rid of old bars
 	}
 
 	@Override
@@ -53,14 +64,6 @@ public class Listener extends ABCMusicBaseListener {
 		System.out.println("Composer: " + composer);
 	}
 
-	@Override
-	public void enterNotesline(ABCMusicParser.NoteslineContext ctx) {
-		/*ArrayList<String> elements = new ArrayList<String>();
-		for(int i=0; i<ctx.element().size()-1; i++){
-			elements.add(i, ctx.element().get(i).getText());
-			System.out.println(ctx.element().get(i).getText());
-		}	*/
-	}
 
 	@Override
 	public void enterFieldmeter(ABCMusicParser.FieldmeterContext ctx) {
@@ -108,13 +111,13 @@ public class Listener extends ABCMusicBaseListener {
 			}
 		}
 		if (ctx.noteorrest().pitch()!=null){ //if pitch
-			char noteChar = ctx.noteorrest().pitch().basenote().getText().charAt(0);
+			char noteChar = ctx.noteorrest().pitch().BASENOTE().getText().charAt(0);
 			int octave = 0;
 			if(Character.isLowerCase(noteChar)){
 				octave += 1;
 			}
 			Letter letter = Letter.fromChar(noteChar);
-			Accidental accidental = Accidental.NATURAL;;
+			Accidental accidental = Accidental.NONE;;
 			if (ctx.noteorrest().pitch().accidental().isEmpty()==false){
 				String accidentalString = ctx.noteorrest().pitch().accidental().get(0).getText();
 				switch (accidentalString){
@@ -248,15 +251,53 @@ public class Listener extends ABCMusicBaseListener {
 		// END_REPEAT, END_SECTION, NONE; suffix
 		// FIRST_ENDING, SECOND_ENDING, BEGIN_REPEAT, BEGIN_SECTION, NONE; prefix
 		switch (barString){
+		case ":|":
+			endRepeat = true;
+		case "||":
 		case "|]":
+			endSection = true;
 		case "|":
-			Bar bar  = new Bar(currentNoteList);
+			Bar bar  = new Bar(currentNoteList, new ArrayList<Lyric>(), getPrefix(),getSuffix());
 			barList.add(bar);
 			currentNoteList = new ArrayList<SoundEvent>();
+			resetBarBooleans();
+			break;
+		case "[|":
+			beginSection = true;
+		case "|:":
+			beginRepeat = true;
+			break;
+		case "[1":
+			firstEnding = true;
+			break;
+		case "[2":
+			secondEnding = true;
 			break;
 		}
 	}
 
+	public BarSuffix getSuffix(){
+		if(endRepeat){return BarSuffix.END_REPEAT;}
+		else if(endSection){return BarSuffix.END_SECTION;}
+		return BarSuffix.NONE;
+	}
+	public BarPrefix getPrefix(){
+		if(firstEnding){return BarPrefix.FIRST_ENDING;}
+		else if(secondEnding){return BarPrefix.SECOND_ENDING;}
+		else if(beginRepeat){return BarPrefix.BEGIN_REPEAT;}
+		else if(beginSection){return BarPrefix.BEGIN_SECTION;}
+		return BarPrefix.NONE;
+	}
+	public void resetBarBooleans(){
+		//suffixes
+		endRepeat = false;
+		endSection = false; 
+		//prefixes
+		firstEnding = false;
+		secondEnding = false;
+		beginRepeat = false;
+		beginSection = false;
+	}
 	@Override
 	public void enterLyric(ABCMusicParser.LyricContext ctx) {
 	}
@@ -264,7 +305,7 @@ public class Listener extends ABCMusicBaseListener {
 
 	@Override
 	public void enterFieldkey(ABCMusicParser.FieldkeyContext ctx) {
-		Letter letter = Letter.fromChar(ctx.key().keynote().basenote()
+		Letter letter = Letter.fromChar(ctx.key().keynote().BASENOTE()
 				.getText().charAt(0));
 		SingleAccidental accidental = SingleAccidental.NATURAL;
 		boolean major = true;
@@ -276,6 +317,9 @@ public class Listener extends ABCMusicBaseListener {
 			} else if (ctx.key().keynote().keyaccidental().get(0).getText()
 					.equals("#")) {
 				accidental = SingleAccidental.SHARP;
+			}
+			else{
+				throw new RuntimeException("Invalid key accidental.");
 			}
 		}
 		if (ctx.key().modeminor().size() != 0
@@ -300,12 +344,23 @@ public class Listener extends ABCMusicBaseListener {
 				+ defaultDuration.getNumerator() + "/"
 				+ defaultDuration.getDenominator());
 	}
-
+	
+	@Override
+	public void enterAbctune(ABCMusicParser.AbctuneContext ctx){
+		resetBarBooleans(); //set them to false
+	}
+	
 	@Override 
 	public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
-		if (barList.isEmpty()==false){
+		if (barList.isEmpty()==false){ //assign barList if we have one
+			if (barMap.containsKey(currentVoice)==true){
+				List<Bar> oldBarList = barMap.get(currentVoice); //get bars previously assigned to voice
+				oldBarList.addAll(barList); //merge with current working bars
+				barMap.put(currentVoice, oldBarList); //put it back on the map
+			}
+			else{
 			barMap.put(currentVoice,barList);
-			System.out.println("Voice and bars mapped." + barMap.keySet());
+			}
 		}
 		if (defaultDuration==null){ // (L) meter<0.75 default note length is
 			// sixteenth note

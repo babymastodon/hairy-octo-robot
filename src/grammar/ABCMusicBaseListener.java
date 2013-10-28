@@ -24,9 +24,6 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 	@Override public void enterTempo(ABCMusicParser.TempoContext ctx) { }
 	@Override public void exitTempo(ABCMusicParser.TempoContext ctx) { }
 
-	@Override public void enterBasenote(ABCMusicParser.BasenoteContext ctx) { }
-	@Override public void exitBasenote(ABCMusicParser.BasenoteContext ctx) { }
-
 	@Override public void enterSpace(ABCMusicParser.SpaceContext ctx) { }
 	@Override public void exitSpace(ABCMusicParser.SpaceContext ctx) { }
 
@@ -128,9 +125,6 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 
 	@Override public void enterTupletelement(ABCMusicParser.TupletelementContext ctx) { }
 	@Override public void exitTupletelement(ABCMusicParser.TupletelementContext ctx) { }
-
-	@Override public void enterRest(ABCMusicParser.RestContext ctx) { }
-	@Override public void exitRest(ABCMusicParser.RestContext ctx) { }
 
 	@Override public void enterFielddefaultlength(ABCMusicParser.FielddefaultlengthContext ctx) { }
 	@Override public void exitFielddefaultlength(ABCMusicParser.FielddefaultlengthContext ctx) { }
