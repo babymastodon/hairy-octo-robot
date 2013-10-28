@@ -81,7 +81,7 @@ modeminor : 'm';
 meter : BASENOTE | 'C|' | meterfraction;
 meterfraction : DIGIT+ '/' DIGIT+;
 tempo : meterfraction '=' DIGIT+;
-abcmusic : abcline+;
+abcmusic : abcline*;
 abcline :  notesline (lyric LINEFEED*)* | midtunefield | comment | LINEFEED;
 notesline : element+ LINEFEED;
 //abcline : element+ LINEFEED | midtunefield | comment;
