@@ -81,7 +81,7 @@ public class Duration {
     }
 
     private void reduce(){
-        for (int i=2; i<numerator; i++){
+        for (int i=2; i<=numerator; i++){
             while (numerator%i == 0 && denominator%i == 0){
                 numerator /= i;
                 denominator /= i;

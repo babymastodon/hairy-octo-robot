@@ -25,7 +25,7 @@ public class SongConverterTest {
                         new SoundEvent(
                             new Sound(new Pitch(C)),
                             new Duration(1,1)))));
-        // Test song is in the key of A major
+        // Note: Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(1, output.size());
@@ -50,7 +50,6 @@ public class SongConverterTest {
                         new SoundEvent(
                             new Sound(new Pitch(A)),
                             new Duration(1,1)))));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(2, output.size());
@@ -78,7 +77,6 @@ public class SongConverterTest {
                         new SoundEvent(
                             new Sound(new Pitch(A)),
                             new Duration(1,1)))));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(3, output.size());
@@ -108,7 +106,6 @@ public class SongConverterTest {
                         new SoundEvent(
                             new Sound(new Pitch(A)),
                             new Duration(1,1)))));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(3, output.size());
@@ -137,7 +134,6 @@ public class SongConverterTest {
                                     new Pitch(A),
                                     new Pitch(C))),
                             new Duration(1,1)))));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(2, output.size());
@@ -164,7 +160,6 @@ public class SongConverterTest {
                     new ArrayList<Lyric>(),
                     BarPrefix.BEGIN_REPEAT,
                     BarSuffix.END_REPEAT));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(2, output.size());
@@ -186,7 +181,6 @@ public class SongConverterTest {
                     new ArrayList<Lyric>(),
                     BarPrefix.NONE,
                     BarSuffix.END_REPEAT));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(2, output.size());
@@ -216,7 +210,6 @@ public class SongConverterTest {
                     new ArrayList<Lyric>(),
                     BarPrefix.NONE,
                     BarSuffix.END_REPEAT));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(3, output.size());
@@ -245,7 +238,6 @@ public class SongConverterTest {
                     new ArrayList<Lyric>(),
                     BarPrefix.SECOND_ENDING,
                     BarSuffix.NONE));
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(2, output.size());
@@ -279,23 +271,160 @@ public class SongConverterTest {
                     prefixes[i],
                     suffixes[i]));
         }
-        // Test song is in the key of A major
         List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
 
         assertEquals(13, output.size());
     }
+
+
+    /**
+     * Should assign lyrics to the proper notes
+     *
+     * A z A |
+     * w: blah roar
+     */
+    @Test
+    public void testLyricAlignment() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    Arrays.asList(
+                        new Lyric("blah"),
+                        new Lyric("roar"))));
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(3, output.size());
+        assertEquals("blah", output.get(0).getLyric().getText());
+        assertEquals("roar", output.get(2).getLyric().getText());
+    }
+
+
+    /**
+     * Should ignore extra lyrics in the bar.
+     */
+    @Test
+    public void testLyricExtraLyrics() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    Arrays.asList(
+                        new Lyric("a"),
+                        new Lyric("b"),
+                        new Lyric("c"),
+                        new Lyric("d"))));
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(2, output.size());
+        assertEquals("a", output.get(0).getLyric().getText());
+        assertEquals("b", output.get(1).getLyric().getText());
+    }
+
+
+    /**
+     * Should not assign lyrics if there are too few in the bar.
+     */
+    @Test
+    public void testLyricNotEnoughLyrics() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    Arrays.asList(
+                        new Lyric("a"))));
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(2, output.size());
+        assertEquals("a", output.get(0).getLyric().getText());
+        assertEquals(false, output.get(1).hasLyric());
+    }
+
+
+    /**
+     * Should properly calculate ticksPerBeat, beatsPerMinute,
+     * and note durations in ticks.
+     */
+    @Test
+    public void testTempoSimple() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1)))));
+        PlayableSong output = makePlayableSong(bars);
+        List<PlayableSoundEvent> events = output.getEvents(new Voice());
+
+        assertEquals(100, output.getBeatsPerMinute());
+        assertEquals(7, output.getTicksPerBeat());
+        assertEquals(1, events.size());
+        assertEquals(4, events.get(0).getTicks());
+    }
+
+
+    /**
+     * Should properly calculate ticksPerBeat, beatsPerMinute,
+     * and note durations in ticks.
+     *
+     * This time, the notes have non-default durations.
+     */
+    @Test
+    public void testTempoComplex() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(3,9)),
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(2,15)))));
+        PlayableSong output = makePlayableSong(bars);
+        List<PlayableSoundEvent> events = output.getEvents(new Voice());
+
+        assertEquals(100, output.getBeatsPerMinute());
+        assertEquals(105, output.getTicksPerBeat());
+        assertEquals(2, events.size());
+        assertEquals(20, events.get(0).getTicks());
+        assertEquals(8, events.get(1).getTicks());
+    }
+
 
     private Song makeTestSong(List<Bar> bars){
         KeySignature key = new KeySignature(A, SingleAccidental.NATURAL, true);
         Map<Voice, List<Bar>> barmap = new HashMap<Voice, List<Bar>>();
         barmap.put(new Voice(), bars);
         return new Song(barmap, 1, "Title", "Composer", 4, 4,
-                new Duration(1,4), key, new Duration(1,4), 100);
+                new Duration(1,7), key, new Duration(1,4), 100);
     }
 
     private List<PlayableSoundEvent> makeAndConvertTestSong(List<Bar> bars){
         Song song = makeTestSong(bars);
         PlayableSong output = new SongConverter(song).getResult();
         return output.getEvents(new Voice());
+    }
+
+    private PlayableSong makePlayableSong(List<Bar> bars){
+        Song song = makeTestSong(bars);
+        return new SongConverter(song).getResult();
     }
 }

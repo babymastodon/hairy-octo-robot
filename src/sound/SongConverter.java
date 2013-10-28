@@ -101,7 +101,7 @@ public class SongConverter {
      *        be calculated for.
      * @return The number of ticks per beat
      */
-    private int calcTicksPerBeat(Song song){
+    private int calcGCD(Song song){
         List<Voice> voicesList = song.listVoices();
         Set<Integer> setOfDenominators = new TreeSet<Integer>();
         setOfDenominators.add(song.getBeatDuration().getDenominator());
@@ -145,12 +145,12 @@ public class SongConverter {
     /**
      * Converts a Song to a PlayableSong.
      * 
-     * @param ticksPerBeat The number of ticks per default beat in the Song
+     * @param gcd The number of ticks per default beat in the Song
      * @param songAccidentals The Song to be converted. Requires songAccidentals 
      *        already has its accidentals correctly applied through to each individual Sound.
      * @return A PlayableSong that represents songAccidentals.
      */
-    private PlayableSong convert(int ticksPerBeat, Song songAccidentals){
+    private PlayableSong convert(int gcd, Song songAccidentals){
         List<Voice> voicesList = songAccidentals.listVoices();
         
         Map<Voice,List<PlayableSoundEvent>> newVoicesToSoundEvent = new HashMap<Voice,List<PlayableSoundEvent>>();
@@ -166,7 +166,8 @@ public class SongConverter {
                 List<Lyric> lyricsForBar = new ArrayList<Lyric>(currentBar.getLyrics());
                                            
                 for(SoundEvent soundEvent : soundEventsList){
-                    int numTicks = (soundEvent.getDuration().getNumerator()*ticksPerBeat) / soundEvent.getDuration().getDenominator();
+                    Duration absoluteDuration = soundEvent.getDuration().mul(song.getDefaultDuration());
+                    int numTicks = (absoluteDuration.getNumerator()*gcd) / absoluteDuration.getDenominator();
                     boolean soundIsNotARest = soundEvent.getSound().getPitches().size() > 0;
                     boolean lyricsLeftToAdd = lyricsForBar.size() > 0;
                     
@@ -188,6 +189,7 @@ public class SongConverter {
         }
         
         int beatsPerMinute = songAccidentals.getBeatsPerMinute();
+        int ticksPerBeat = gcd * song.getBeatDuration().getNumerator() / song.getBeatDuration().getDenominator();
         return new PlayableSong(newVoicesToSoundEvent,beatsPerMinute,ticksPerBeat);       
     }
     
@@ -288,7 +290,7 @@ public class SongConverter {
      */
     public PlayableSong getResult(){
         Song songWithFilledInAccidentals = distributeInAccidentals();
-        int ticksPerBeat = calcTicksPerBeat(songWithFilledInAccidentals);
-        return convert(ticksPerBeat,songWithFilledInAccidentals);    
+        int gcd = calcGCD(songWithFilledInAccidentals);
+        return convert(gcd,songWithFilledInAccidentals);    
     }
 }
