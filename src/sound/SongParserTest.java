@@ -486,6 +486,18 @@ public class SongParserTest {
         assertEquals(BarSuffix.END_SECTION, bars.get(2).getSuffix());
     }
 
+    /**
+     * Test that lyric words accept all valid characters.
+     */
+    @Test
+    public void testBodyLyricsCharacters(){
+        Song s = readSong("test_abc/body_lyrics_characters.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(1, bars.size());
+        assertEquals(2, bars.get(0).getLyrics().size());
+        assertEquals("zyxwvutsrqpomnlkjihgfedcba", bars.get(0).getLyrics().get(0).getText());
+        assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", bars.get(0).getLyrics().get(1).getText());
+    }
 
     /**
      * Test that lyrics are assigned to the proper bars
@@ -672,15 +684,12 @@ public class SongParserTest {
 
 
     /**
-     * Test that the voice definitions in the header are parsed.
+     * Test that the voice definitions in the header don't
+     * cause errors.
      */
     @Test
     public void testHeaderVoices(){
         Song s = readSong("test_abc/header_voices.abc");
-        assertEquals(3, s.listVoices().size());
-        assertTrue(s.listVoices().contains(" upper"));
-        assertTrue(s.listVoices().contains("middle"));
-        assertTrue(s.listVoices().contains("lower"));
     }
 
 
@@ -762,6 +771,23 @@ public class SongParserTest {
         for (File file: basedir.listFiles()){
             readSong(file.getPath());
         }
+    }
+
+    /**
+     * Should not crash on valid spaces in the body.
+     *
+     * Valid octave identifiers:
+     *      lowercase/capital letters
+     *      arbitrarily long sequences of commas or apostrophes
+     *
+     */
+    @Test
+    public void testBodySpaces(){
+        Song s = readSong("test_abc/body_valid_spaces.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(2, bars.size());
+        assertEquals(2, bars.get(0).getLyrics().size());
+        assertEquals(1, bars.get(1).getLyrics().size());
     }
 
 
