@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 
 public class Listener extends ABCMusicBaseListener {
 	//Song Params
-	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>();
+	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>(); //barLists map
 	private Song song;
 	private int index; // req of abc files
 	private String title; // req of abc files
@@ -29,7 +29,7 @@ public class Listener extends ABCMusicBaseListener {
 	
 	//Things to keep track of:
 	private Voice currentVoice = new Voice(); //keeps track of applicable voice -- set up with default voice
-	private ArrayList<Bar> barList = new ArrayList<Bar>(); //current list of bars
+	private List<Bar> barList = new ArrayList<Bar>(); //current list of bars
 	private ArrayList<SoundEvent> currentNoteList = new ArrayList<SoundEvent>(); //Store sounds for current bar in
 	private boolean inMultinote = false;
 	private ArrayList<Pitch> multinoteList = new ArrayList<Pitch>();
@@ -43,7 +43,19 @@ public class Listener extends ABCMusicBaseListener {
 
 	@Override
 	public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) {
-		currentVoice = new Voice(ctx.fieldvoice().text().getText());
+		if (barList.isEmpty()==false){ //assign barList if we have one before we get new voice
+			if (barMap.containsKey(currentVoice)==true){
+				List<Bar> oldBarList = barMap.get(currentVoice); //get bars previously assigned to voice
+				oldBarList.addAll(barList); //merge with current working bars
+				barMap.put(currentVoice, oldBarList); //put it back on the map
+			}
+			else{
+			barMap.put(currentVoice,barList);
+			}
+			//System.out.println("Voice and bars mapped." + barMap.keySet());
+		}
+		currentVoice = new Voice(ctx.fieldvoice().text().getText()); //new voice
+		barList = new ArrayList<Bar>(); //get rid of old bars
 	}
 
 	@Override
@@ -340,9 +352,15 @@ public class Listener extends ABCMusicBaseListener {
 	
 	@Override 
 	public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
-		if (barList.isEmpty()==false){
+		if (barList.isEmpty()==false){ //assign barList if we have one
+			if (barMap.containsKey(currentVoice)==true){
+				List<Bar> oldBarList = barMap.get(currentVoice); //get bars previously assigned to voice
+				oldBarList.addAll(barList); //merge with current working bars
+				barMap.put(currentVoice, oldBarList); //put it back on the map
+			}
+			else{
 			barMap.put(currentVoice,barList);
-			System.out.println("Voice and bars mapped." + barMap.keySet());
+			}
 		}
 		if (defaultDuration==null){ // (L) meter<0.75 default note length is
 			// sixteenth note
