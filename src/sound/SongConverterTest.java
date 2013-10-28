@@ -375,9 +375,9 @@ public class SongConverterTest {
         List<PlayableSoundEvent> events = output.getEvents(new Voice());
 
         assertEquals(100, output.getBeatsPerMinute());
-        assertEquals(1, output.getTicksPerBeat());
+        assertEquals(7, output.getTicksPerBeat());
         assertEquals(1, events.size());
-        assertEquals(1, events.get(0).getTicks());
+        assertEquals(4, events.get(0).getTicks());
     }
 
 
@@ -394,7 +394,7 @@ public class SongConverterTest {
                     Arrays.asList(
                         new SoundEvent(
                             new Sound(new Pitch(A)),
-                            new Duration(9,81)),
+                            new Duration(3,9)),
                         new SoundEvent(
                             new Sound(new Pitch(A)),
                             new Duration(2,15)))));
@@ -402,10 +402,10 @@ public class SongConverterTest {
         List<PlayableSoundEvent> events = output.getEvents(new Voice());
 
         assertEquals(100, output.getBeatsPerMinute());
-        assertEquals(45, output.getTicksPerBeat());
+        assertEquals(105, output.getTicksPerBeat());
         assertEquals(2, events.size());
-        assertEquals(5, events.get(0).getTicks());
-        assertEquals(6, events.get(1).getTicks());
+        assertEquals(20, events.get(0).getTicks());
+        assertEquals(8, events.get(1).getTicks());
     }
 
 
@@ -414,7 +414,7 @@ public class SongConverterTest {
         Map<Voice, List<Bar>> barmap = new HashMap<Voice, List<Bar>>();
         barmap.put(new Voice(), bars);
         return new Song(barmap, 1, "Title", "Composer", 4, 4,
-                new Duration(1,4), key, new Duration(1,4), 100);
+                new Duration(1,7), key, new Duration(1,4), 100);
     }
 
     private List<PlayableSoundEvent> makeAndConvertTestSong(List<Bar> bars){
