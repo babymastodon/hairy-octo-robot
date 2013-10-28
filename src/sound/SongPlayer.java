@@ -11,6 +11,7 @@ import java.util.*;
 public class SongPlayer {
     
     PlayableSong song;
+    LyricListener listener;
     
     
     /**
@@ -20,8 +21,9 @@ public class SongPlayer {
      * @param song the song to be played
      * @param listener the lyric listener that is to recieve the lyrics
      */
-    public SongPlayer(PlayableSong song){
+    public SongPlayer(PlayableSong song, LyricListener listener){
         this.song = song;
+        this.listener = listener;
     }
     
     
@@ -33,13 +35,7 @@ public class SongPlayer {
         SequencePlayer player;
 
         try {
-            LyricListener listener = new LyricListener() {
-                public void processLyricEvent(String text) {
-                    System.out.print(text + " ");
-                }
-            };
-
-            player = new SequencePlayer(song.getBeatsPerMinute(), song.getTicksPerBeat(), listener);
+            player = new SequencePlayer(song.getBeatsPerMinute(), song.getTicksPerBeat(), this.listener);
             
             for(Voice voice : song.listVoices()){
                 int startTick = 0;
