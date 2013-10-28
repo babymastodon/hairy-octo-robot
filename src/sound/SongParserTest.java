@@ -486,6 +486,18 @@ public class SongParserTest {
         assertEquals(BarSuffix.END_SECTION, bars.get(2).getSuffix());
     }
 
+    /**
+     * Test that lyric words accept all valid characters.
+     */
+    @Test
+    public void testBodyLyricsCharacters(){
+        Song s = readSong("test_abc/body_lyrics_characters.abc");
+        List<Bar> bars = s.getBars(new Voice());
+        assertEquals(1, bars.size());
+        assertEquals(2, bars.get(0).getLyrics().size());
+        assertEquals("zyxwvutsrqpomnlkjihgfedcba", bars.get(0).getLyrics().get(0).getText());
+        assertEquals("ABCDEFGHIJKLMNOPQRSTUVWXYZ", bars.get(0).getLyrics().get(1).getText());
+    }
 
     /**
      * Test that lyrics are assigned to the proper bars
