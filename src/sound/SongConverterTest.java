@@ -222,6 +222,69 @@ public class SongConverterTest {
         assertEquals(3, output.size());
     }
 
+
+    /**
+     * Should skip the first ending on the second repeat.
+     */
+    @Test
+    public void testRepeatSkipFirstEnding() {
+        List<Bar> bars = Arrays.asList(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.FIRST_ENDING,
+                    BarSuffix.END_REPEAT),
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    BarPrefix.SECOND_ENDING,
+                    BarSuffix.NONE));
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(2, output.size());
+    }
+
+
+    /**
+     * Should properly handle multiple repeats in a row.
+     *
+     * A |] A :| A |] A :| A |: A |[1 A :|[2 A |: A :|
+     */
+    @Test
+    public void testRepeatMultipleRepeats() {
+        BarPrefix[] prefixes = {
+            BarPrefix.NONE, BarPrefix.NONE, BarPrefix.NONE,
+            BarPrefix.NONE, BarPrefix.NONE, BarPrefix.BEGIN_REPEAT,
+            BarPrefix.FIRST_ENDING, BarPrefix.SECOND_ENDING, BarPrefix.BEGIN_REPEAT};
+        BarSuffix[] suffixes = {
+            BarSuffix.END_SECTION, BarSuffix.END_REPEAT, BarSuffix.END_SECTION,
+            BarSuffix.END_REPEAT, BarSuffix.NONE, BarSuffix.NONE,
+            BarSuffix.END_REPEAT, BarSuffix.NONE, BarSuffix.END_REPEAT};
+        List<Bar> bars = new ArrayList<Bar>();
+        for (int i=0; i<9; i++){
+            bars.add(
+                new Bar(
+                    Arrays.asList(
+                        new SoundEvent(
+                            new Sound(new Pitch(A)),
+                            new Duration(1,1))),
+                    new ArrayList<Lyric>(),
+                    prefixes[i],
+                    suffixes[i]));
+        }
+        // Test song is in the key of A major
+        List<PlayableSoundEvent> output = makeAndConvertTestSong(bars);
+
+        assertEquals(13, output.size());
+    }
+
     private Song makeTestSong(List<Bar> bars){
         KeySignature key = new KeySignature(A, SingleAccidental.NATURAL, true);
         Map<Voice, List<Bar>> barmap = new HashMap<Voice, List<Bar>>();
