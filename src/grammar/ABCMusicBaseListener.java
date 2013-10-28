@@ -66,11 +66,11 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 	@Override public void enterMeterfraction(ABCMusicParser.MeterfractionContext ctx) { }
 	@Override public void exitMeterfraction(ABCMusicParser.MeterfractionContext ctx) { }
 
-	@Override public void enterKey(ABCMusicParser.KeyContext ctx) { }
-	@Override public void exitKey(ABCMusicParser.KeyContext ctx) { }
-
 	@Override public void enterNote(ABCMusicParser.NoteContext ctx) { }
 	@Override public void exitNote(ABCMusicParser.NoteContext ctx) { }
+
+	@Override public void enterKey(ABCMusicParser.KeyContext ctx) { }
+	@Override public void exitKey(ABCMusicParser.KeyContext ctx) { }
 
 	@Override public void enterKeynote(ABCMusicParser.KeynoteContext ctx) { }
 	@Override public void exitKeynote(ABCMusicParser.KeynoteContext ctx) { }
@@ -99,6 +99,9 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 	@Override public void enterFieldnumber(ABCMusicParser.FieldnumberContext ctx) { }
 	@Override public void exitFieldnumber(ABCMusicParser.FieldnumberContext ctx) { }
 
+	@Override public void enterNotesline(ABCMusicParser.NoteslineContext ctx) { }
+	@Override public void exitNotesline(ABCMusicParser.NoteslineContext ctx) { }
+
 	@Override public void enterOctave(ABCMusicParser.OctaveContext ctx) { }
 	@Override public void exitOctave(ABCMusicParser.OctaveContext ctx) { }
 
@@ -113,9 +116,6 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 
 	@Override public void enterNotelength(ABCMusicParser.NotelengthContext ctx) { }
 	@Override public void exitNotelength(ABCMusicParser.NotelengthContext ctx) { }
-
-	@Override public void enterNthrepeat(ABCMusicParser.NthrepeatContext ctx) { }
-	@Override public void exitNthrepeat(ABCMusicParser.NthrepeatContext ctx) { }
 
 	@Override public void enterFieldkey(ABCMusicParser.FieldkeyContext ctx) { }
 	@Override public void exitFieldkey(ABCMusicParser.FieldkeyContext ctx) { }

@@ -21,7 +21,10 @@ public class SongParserTest {
     // TODO: remove this function when done debugging
     @Test
     public void testParsePublic() {
-        readSong("sample_abc/piece1.abc");
+        Song song = readSong("sample_abc/piece1 notes.abc");
+        System.out.println(song.getBars(new Voice()));
+        PlayableSong playableSong = new SongConverter(song).getResult();
+        new SongPlayer(playableSong).play();
     }
 
 
