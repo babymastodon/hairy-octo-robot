@@ -49,13 +49,13 @@ public class SongParserTest {
         for (File file: basedir.listFiles()){
             Song s = readSong(file.getPath());
 
-            assertEquals(s.getTitle(), "Simple scale");
-            assertEquals(s.getIndex(), 1);
-            assertEquals(s.getBeatsPerMinute(), 120);
-            assertEquals(s.getMeterNumerator(), 1);
-            assertEquals(s.getMeterDenominator(), 4);
-            assertEquals(s.getDefaultDuration(), new Duration(1,4));
-            assertEquals(s.getComposer(), "Composer Name");
+            assertEquals("Simple scale", s.getTitle());
+            assertEquals(1, s.getIndex());
+            assertEquals(120, s.getBeatsPerMinute());
+            assertEquals(1, s.getMeterNumerator());
+            assertEquals(4, s.getMeterDenominator());
+            assertEquals(new Duration(1,4), s.getDefaultDuration());
+            assertEquals("Composer Name", s.getComposer());
         }
     }
 
@@ -69,15 +69,15 @@ public class SongParserTest {
         Song s = readSong("test_abc/header_valid_spaces.abc");
 
         //the title contains two invisible tab charactes
-        assertEquals(s.getTitle(), "   	Simple	scale");
-        assertEquals(s.getIndex(),  1);
-        assertEquals(s.getBeatsPerMinute(),  1200);
-        assertEquals(s.getBeatDuration(), new Duration(1,42));
-        assertEquals(s.getMeterNumerator(),  4);
-        assertEquals(s.getMeterDenominator(),  4);
-        assertEquals(s.getDefaultDuration(), new Duration(1,4));
+        assertEquals("   	Simple	scale", s.getTitle());
+        assertEquals(1, s.getIndex());
+        assertEquals(1200, s.getBeatsPerMinute());
+        assertEquals(new Duration(1,42), s.getBeatDuration());
+        assertEquals(4, s.getMeterNumerator());
+        assertEquals(4, s.getMeterDenominator());
+        assertEquals(new Duration(1,4), s.getDefaultDuration());
         //the title contains two invisible tab charactes
-        assertEquals(s.getComposer(), "   	Unknown   	");
+        assertEquals("   	Unknown   	", s.getComposer());
     }
 
 
@@ -116,8 +116,8 @@ public class SongParserTest {
     @Test
     public void testHeaderDefaultM(){
         Song s = readSong("test_abc/header_defaults/default_M.abc");
-        assertEquals(s.getMeterNumerator(), 4);
-        assertEquals(s.getMeterDenominator(), 4);
+        assertEquals(4, s.getMeterNumerator());
+        assertEquals(4, s.getMeterDenominator());
     }
 
     /**
@@ -135,16 +135,16 @@ public class SongParserTest {
     @Test
     public void testHeaderDefaultL(){
         Song s = readSong("test_abc/header_defaults/default_L_no_M.abc");
-        assertEquals(s.getDefaultDuration(), new Duration(1,8));
+        assertEquals(new Duration(1,8), s.getDefaultDuration());
 
         s = readSong("test_abc/header_defaults/default_L_with_M=11-16.abc");
-        assertEquals(s.getDefaultDuration(), new Duration(1,16));
+        assertEquals(new Duration(1,16), s.getDefaultDuration());
 
         s = readSong("test_abc/header_defaults/default_L_with_M=12-16.abc");
-        assertEquals(s.getDefaultDuration(), new Duration(1,8));
+        assertEquals(new Duration(1,8), s.getDefaultDuration());
 
         s = readSong("test_abc/header_defaults/default_L_with_M=13-16.abc");
-        assertEquals(s.getDefaultDuration(), new Duration(1,8));
+        assertEquals(new Duration(1,8), s.getDefaultDuration());
     }
 
     /**
@@ -160,8 +160,8 @@ public class SongParserTest {
     @Test
     public void testHeaderDefaultQ(){
         Song s = readSong("test_abc/header_defaults/default_Q.abc");
-        assertEquals(s.getBeatsPerMinute(), 100);
-        assertEquals(s.getBeatDuration(), new Duration(1,8));
+        assertEquals(100, s.getBeatsPerMinute());
+        assertEquals(new Duration(1,8), s.getBeatDuration());
     }
 
 
@@ -205,7 +205,7 @@ public class SongParserTest {
         }
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -231,7 +231,7 @@ public class SongParserTest {
         }
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -256,7 +256,7 @@ public class SongParserTest {
         }
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -276,7 +276,7 @@ public class SongParserTest {
                     new Duration(1,5)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -294,7 +294,7 @@ public class SongParserTest {
                     new Duration(4,19)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -320,7 +320,7 @@ public class SongParserTest {
                     new Duration(7,5)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -347,7 +347,7 @@ public class SongParserTest {
                     new Duration(21,2)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -378,7 +378,7 @@ public class SongParserTest {
                     new Duration(2,3)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -413,7 +413,7 @@ public class SongParserTest {
                     new Duration(3,4)));
 
         Bar expected = new Bar(events);
-        assertEquals(s.getBars(new Voice()), Arrays.asList(expected));
+        assertEquals(Arrays.asList(expected), s.getBars(new Voice()));
     }
 
 
@@ -424,9 +424,9 @@ public class SongParserTest {
     public void testBodySimpleRepeat(){
         Song s = readSong("test_abc/body_repeat_simple.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 1);
-        assertEquals(bars.get(0).getPrefix(), BarPrefix.BEGIN_REPEAT);
-        assertEquals(bars.get(0).getSuffix(), BarSuffix.END_REPEAT);
+        assertEquals(1, bars.size());
+        assertEquals(BarPrefix.BEGIN_REPEAT, bars.get(0).getPrefix());
+        assertEquals(BarSuffix.END_REPEAT, bars.get(0).getSuffix());
     }
 
 
@@ -438,10 +438,10 @@ public class SongParserTest {
     public void testBodyTwoBarRepeat(){
         Song s = readSong("test_abc/body_repeat_two_bar.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getPrefix(), BarPrefix.NONE);
-        assertEquals(bars.get(1).getSuffix(), BarSuffix.END_REPEAT);
-        assertEquals(bars.get(1).getPrefix(), BarPrefix.NONE);
+        assertEquals(2, bars.size());
+        assertEquals(BarPrefix.NONE, bars.get(0).getPrefix());
+        assertEquals(BarSuffix.END_REPEAT, bars.get(1).getSuffix());
+        assertEquals(BarPrefix.NONE, bars.get(1).getPrefix());
     }
 
 
@@ -454,9 +454,9 @@ public class SongParserTest {
     public void testBodyRepeatSectionEnd(){
         Song s = readSong("test_abc/body_repeat_section_end.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getSuffix(), BarSuffix.END_SECTION);
-        assertEquals(bars.get(2).getSuffix(), BarSuffix.END_REPEAT);
+        assertEquals(3, bars.size());
+        assertEquals(BarSuffix.END_SECTION, bars.get(0).getSuffix());
+        assertEquals(BarSuffix.END_REPEAT, bars.get(2).getSuffix());
     }
 
 
@@ -467,8 +467,8 @@ public class SongParserTest {
     public void testBodySectionBegin(){
         Song s = readSong("test_abc/body_section_begin.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 1);
-        assertEquals(bars.get(0).getPrefix(), BarPrefix.BEGIN_SECTION);
+        assertEquals(1, bars.size());
+        assertEquals(BarPrefix.BEGIN_SECTION, bars.get(0).getPrefix());
     }
 
 
@@ -480,10 +480,10 @@ public class SongParserTest {
     public void testBodyRepeatEndingNumber(){
         Song s = readSong("test_abc/body_repeat_ending_number.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(1).getPrefix(), BarPrefix.FIRST_ENDING);
-        assertEquals(bars.get(2).getPrefix(), BarPrefix.SECOND_ENDING);
-        assertEquals(bars.get(2).getSuffix(), BarSuffix.END_SECTION);
+        assertEquals(3, bars.size());
+        assertEquals(BarPrefix.FIRST_ENDING, bars.get(1).getPrefix());
+        assertEquals(BarPrefix.SECOND_ENDING, bars.get(2).getPrefix());
+        assertEquals(BarSuffix.END_SECTION, bars.get(2).getSuffix());
     }
 
 
@@ -500,11 +500,11 @@ public class SongParserTest {
     public void testBodyLyricsBar(){
         Song s = readSong("test_abc/body_lyrics_bar.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
+        assertEquals(2, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("def", bars.get(1).getLyrics().get(0).getText());
     }
 
 
@@ -516,11 +516,11 @@ public class SongParserTest {
     public void testBodyLyricsSkipBar(){
         Song s = readSong("test_abc/body_lyrics_skip_bar.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 2);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
-        assertEquals(bars.get(0).getLyrics().get(1).getText(), "def");
-        assertEquals(bars.get(1).getLyrics().size(), 2);
+        assertEquals(2, bars.size());
+        assertEquals(2, bars.get(0).getLyrics().size());
+        assertEquals("abc", bars.get(0).getLyrics().get(0).getText());
+        assertEquals("def", bars.get(0).getLyrics().get(1).getText());
+        assertEquals(2, bars.get(1).getLyrics().size());
     }
 
 
@@ -533,11 +533,11 @@ public class SongParserTest {
     public void testBodyLyricsNoBars(){
         Song s = readSong("test_abc/body_lyrics_no_bars.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().size(), 2);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
-        assertEquals(bars.get(1).getLyrics().get(1).getText(), "abc");
+        assertEquals(2, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals(2, bars.get(1).getLyrics().size());
+        assertEquals("def", bars.get(1).getLyrics().get(0).getText());
+        assertEquals("abc", bars.get(1).getLyrics().get(1).getText());
     }
 
 
@@ -549,11 +549,11 @@ public class SongParserTest {
     public void testBodyLyricsTruncateBar(){
         Song s = readSong("test_abc/body_lyrics_truncate_bar.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().size(), 2);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "abc");
-        assertEquals(bars.get(1).getLyrics().get(1).getText(), "def");
+        assertEquals(2, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals(2, bars.get(1).getLyrics().size());
+        assertEquals("abc", bars.get(1).getLyrics().get(0).getText());
+        assertEquals("def", bars.get(1).getLyrics().get(1).getText());
     }
 
 
@@ -564,11 +564,11 @@ public class SongParserTest {
     public void testBodyLyricsHyphen(){
         Song s = readSong("test_abc/body_lyrics_hyphen.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "def");
+        assertEquals(2, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc-", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("def", bars.get(1).getLyrics().get(0).getText());
     }
 
 
@@ -581,13 +581,13 @@ public class SongParserTest {
     public void testBodyLyricsUnderscore(){
         Song s = readSong("test_abc/body_lyrics_underscore.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
-        assertEquals(bars.get(2).getLyrics().size(), 1);
-        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+        assertEquals(3, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("", bars.get(1).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(2).getLyrics().size());
+        assertEquals("def", bars.get(2).getLyrics().get(0).getText());
     }
 
 
@@ -598,13 +598,13 @@ public class SongParserTest {
     public void testBodyLyricsStar(){
         Song s = readSong("test_abc/body_lyrics_star.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
-        assertEquals(bars.get(2).getLyrics().size(), 1);
-        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+        assertEquals(3, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("", bars.get(1).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(2).getLyrics().size());
+        assertEquals("def", bars.get(2).getLyrics().get(0).getText());
     }
 
 
@@ -615,10 +615,10 @@ public class SongParserTest {
     public void testBodyLyricsTilde(){
         Song s = readSong("test_abc/body_lyrics_tilde.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 2);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc def");
-        assertEquals(bars.get(1).getLyrics().size(), 0);
+        assertEquals(2, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc def", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(0, bars.get(1).getLyrics().size());
     }
 
 
@@ -629,11 +629,11 @@ public class SongParserTest {
     public void testBodyLyricsEscapedHyphen(){
         Song s = readSong("test_abc/body_lyrics_escaped_hyphen.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "-abc-def");
-        assertEquals(bars.get(1).getLyrics().size(), 0);
-        assertEquals(bars.get(2).getLyrics().size(), 0);
+        assertEquals(3, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("-abc-def", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(0, bars.get(1).getLyrics().size());
+        assertEquals(0, bars.get(2).getLyrics().size());
     }
 
 
@@ -644,13 +644,13 @@ public class SongParserTest {
     public void testBodyLyricsDoubleHyphen(){
         Song s = readSong("test_abc/body_lyrics_double_hyphen.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "-");
-        assertEquals(bars.get(2).getLyrics().size(), 1);
-        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+        assertEquals(3, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc-", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("-", bars.get(1).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(2).getLyrics().size());
+        assertEquals("def", bars.get(2).getLyrics().get(0).getText());
     }
 
 
@@ -661,13 +661,13 @@ public class SongParserTest {
     public void testBodyLyricsHyphenUnderscore(){
         Song s = readSong("test_abc/body_lyrics_hyphen_underscore.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(bars.size(), 3);
-        assertEquals(bars.get(0).getLyrics().size(), 1);
-        assertEquals(bars.get(0).getLyrics().get(0).getText(), "abc-");
-        assertEquals(bars.get(1).getLyrics().size(), 1);
-        assertEquals(bars.get(1).getLyrics().get(0).getText(), "");
-        assertEquals(bars.get(2).getLyrics().size(), 1);
-        assertEquals(bars.get(2).getLyrics().get(0).getText(), "def");
+        assertEquals(3, bars.size());
+        assertEquals(1, bars.get(0).getLyrics().size());
+        assertEquals("abc-", bars.get(0).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("", bars.get(1).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(2).getLyrics().size());
+        assertEquals("def", bars.get(2).getLyrics().get(0).getText());
     }
 
 
@@ -677,7 +677,7 @@ public class SongParserTest {
     @Test
     public void testHeaderVoices(){
         Song s = readSong("test_abc/header_voices.abc");
-        assertEquals(s.listVoices().size(), 3);
+        assertEquals(3, s.listVoices().size());
         assertTrue(s.listVoices().contains(" upper"));
         assertTrue(s.listVoices().contains("middle"));
         assertTrue(s.listVoices().contains("lower"));
@@ -722,8 +722,8 @@ public class SongParserTest {
                     BarPrefix.NONE,
                     BarSuffix.END_REPEAT));
 
-        assertEquals(v1, expected_v1);
-        assertEquals(v2, expected_v2);
+        assertEquals(expected_v1, v1);
+        assertEquals(expected_v2, v2);
     }
 
 
