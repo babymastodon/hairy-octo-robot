@@ -140,11 +140,10 @@ public class Listener extends ABCMusicBaseListener {
 			}
 			if (ctx.noteorrest().pitch().octave().isEmpty()==false){
 				String octaveString = ctx.noteorrest().pitch().octave().get(0).getText();
-				if (octaveString == "'"){
-					octave += 1;
-				}
-				else if(octaveString == ","){
-					octave -= 1;
+				if (octaveString.charAt(0) == '\''){
+					octave += octaveString.length();
+				} else if (octaveString.charAt(0) == ','){
+					octave -= octaveString.length();
 				}
 			}
 			Duration duration = new Duration(durationNumerator,durationDenominator);

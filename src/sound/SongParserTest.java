@@ -193,8 +193,8 @@ public class SongParserTest {
     @Test
     public void testBodyOctaves(){
         Song s = readSong("test_abc/body_octaves.abc");
-        Letter[] letters = {C, G, B, E, D, C, B, B, E, D};
-        int[] octaves = {0 -1, -2, 1, 2, 1, 0, -1, 2, 3};
+        Letter[] letters = {C, G, B, E, D, C, G, B, E, D};
+        int[] octaves = {0, -1, -2, 1, 2, 1, 0, -1, 2, 3};
 
         List<SoundEvent> events = new ArrayList<SoundEvent>();
         for (int i=0; i<10; i++){
