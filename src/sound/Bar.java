@@ -99,4 +99,47 @@ public class Bar {
     public BarSuffix getSuffix(){
         return suffix;
     }
+
+    /**
+     * Bars are equal if they have the same
+     * sound events, lyrics, and flags.
+     *
+     * @return whether the bars are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj.getClass() != this.getClass())
+            return false;
+        Bar that = (Bar) obj;
+        return this.prefix == that.prefix
+            && this.suffix == that.suffix
+            && this.lyrics.equals(that.lyrics)
+            && this.events.equals(that.events);
+    }
+
+    /**
+     * Updated to reflect the equals() function.
+     *
+     * @return an integer hashcode
+     */
+    @Override
+    public int hashCode() {
+        return this.prefix.hashCode()
+            + this.suffix.hashCode()
+            + this.lyrics.hashCode()
+            + this.events.hashCode();
+    }
+
+    /**
+     * Return a string representation of the bar's contents.
+     *
+     * @return a string
+     */
+    @Override
+    public String toString(){
+        return "Bar(" + events.toString() + ", " + lyrics.toString() + ", "
+           + prefix + ", " + suffix + ")";
+    }
 }

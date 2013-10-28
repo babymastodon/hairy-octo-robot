@@ -17,6 +17,7 @@ import java.util.HashSet;
  */
 public class Sound {
 
+    // Rep invariant: unique and sorted
     private final List<Pitch> pitch_list;
 
     /**
@@ -27,6 +28,7 @@ public class Sound {
     public Sound(List<Pitch> pitches){
         // remove potential duplicates in the given list
         List<Pitch> tmp_list = new ArrayList<Pitch>(new HashSet<Pitch>(pitches));
+        Collections.sort(tmp_list);
         this.pitch_list = Collections.unmodifiableList(tmp_list);
     }
 
@@ -74,7 +76,6 @@ public class Sound {
         if (obj.getClass() != this.getClass())
             return false;
         Sound that = (Sound) obj;
-        // TODO: equality should not depend on order of pitches
         return this.pitch_list.equals(that.getPitches());
     }
 
@@ -86,6 +87,16 @@ public class Sound {
     @Override
     public int hashCode() {
         return pitch_list.hashCode();
+    }
+
+    /**
+     * Return a string representation of the sound's contents.
+     *
+     * @return a string
+     */
+    @Override
+    public String toString(){
+        return "Sound(" + pitch_list.toString() + ")";
     }
 
 }

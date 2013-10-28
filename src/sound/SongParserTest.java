@@ -226,7 +226,7 @@ public class SongParserTest {
         for (int i=0; i<4; i++){
             events.add(
                     new SoundEvent(
-                        new Sound(new Pitch(C, 1)),
+                        new Sound(new Pitch(C, 0)),
                         new Duration(numerators[i], denominators[i])));
         }
 
