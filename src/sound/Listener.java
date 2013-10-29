@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
 
 public class Listener extends ABCMusicBaseListener {
     //Song Params
@@ -40,7 +38,6 @@ public class Listener extends ABCMusicBaseListener {
     private Duration multinoteDuration;
     private boolean inTuplet = false;
     private Duration tupletMultiplier; //duration to alter tuplet note durations
-    private int tupletCount = 0; //counts tuplet notes observed
     private Duration lastDuration = new Duration(1,1); //stores that last duration matched in a notelength context
     //Bar booleans
     Boolean endRepeat, endSection; //suffixes
