@@ -1,0 +1,8 @@
+X:1
+T:TupletFailRestTest
+M:4/4
+L:1/4
+C:Someone
+K:Bb
+%should fail due to tuplet that contains a rest
+A (2A2/3B2/3z2/3 |
