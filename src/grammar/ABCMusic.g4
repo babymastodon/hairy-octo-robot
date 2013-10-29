@@ -110,11 +110,12 @@ rest: 'z' notelength?;
 // chords only contain pitches
 multinote : '[' space? pitch (space | pitch)* ']' notelength?;
 
-notelength: notelengthfull | notelengthnumerator | notelengthdenominator | notelengthdefault;
+notelength: notelengthfull | notelengthmultiply | notelengthnumerator | notelengthdenominator | notelengthhalf;
 notelengthfull: number '/' number;
-notelengthnumerator: number '/'?;
+notelengthmultiply: number;
+notelengthnumerator: number '/';
 notelengthdenominator: '/' number;
-notelengthdefault: '/';
+notelengthhalf: '/';
 
 // tuplets can contain pitches and chords, but not rests
 tuplet : duplet | triplet | quadruplet;

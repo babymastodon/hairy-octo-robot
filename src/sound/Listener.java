@@ -100,9 +100,16 @@ public class Listener extends ABCMusicBaseListener {
     }
 
     @Override
-    public void enterNotelengthnumerator(ABCMusicParser.NotelengthnumeratorContext ctx) {
+    public void enterNotelengthmultiply(ABCMusicParser.NotelengthmultiplyContext ctx) {
         int numerator = Integer.parseInt(ctx.number().getText());
         int denominator = 1;
+        lastDuration = new Duration(numerator, denominator);
+    }
+
+    @Override
+    public void enterNotelengthnumerator(ABCMusicParser.NotelengthnumeratorContext ctx) {
+        int numerator = Integer.parseInt(ctx.number().getText());
+        int denominator = 2;
         lastDuration = new Duration(numerator, denominator);
     }
 
@@ -110,6 +117,13 @@ public class Listener extends ABCMusicBaseListener {
     public void enterNotelengthdenominator(ABCMusicParser.NotelengthdenominatorContext ctx) {
         int numerator = 1;
         int denominator = Integer.parseInt(ctx.number().getText());
+        lastDuration = new Duration(numerator, denominator);
+    }
+
+    @Override
+    public void enterNotelengthhalf(ABCMusicParser.NotelengthhalfContext ctx) {
+        int numerator = 1;
+        int denominator = 2;
         lastDuration = new Duration(numerator, denominator);
     }
 

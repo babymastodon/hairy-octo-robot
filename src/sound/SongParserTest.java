@@ -207,11 +207,11 @@ public class SongParserTest {
     @Test
     public void testBodyDurations(){
         Song s = readSong("test_abc/body_durations.abc");
-        int[] numerators = {1, 5, 3, 1};
-        int[] denominators = {1, 1, 8, 9};
+        int[] numerators = {1, 5, 3, 1, 1, 1};
+        int[] denominators = {1, 1, 8, 9, 2, 1};
 
         List<SoundEvent> events = new ArrayList<SoundEvent>();
-        for (int i=0; i<4; i++){
+        for (int i=0; i<6; i++){
             events.add(
                     new SoundEvent(
                         new Sound(new Pitch(C, 0)),
