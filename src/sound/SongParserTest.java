@@ -18,24 +18,13 @@ import static sound.Accidental.*;
 
 public class SongParserTest {
 
-    // TODO: remove this function when done debugging
-    @Test
-    public void testParsePublic() {
-        Song song = readSong("sample_abc/piece1 notes.abc");
-        System.out.println(song.getBars(new Voice()));
-        PlayableSong playableSong = new SongConverter(song).getResult();
-        new SongPlayer(playableSong, new ConsoleLyricListener()).play();
-    }
-
-
     /**
      * Should not crash on this set of real-world examples.
      */
     @Test
     public void testRealWorldExamples(){
-        File basedir = new File("sample_abc");
-        for (File file: basedir.listFiles()){
-            readSong(file.getPath());
+        for (String path: listAbcFiles("sample_abc")){
+            readSong(path);
         }
     }
 
@@ -45,17 +34,17 @@ public class SongParserTest {
      */
     @Test
     public void testHeaderOrder(){
-        File basedir = new File("test_abc/header_order");
-        for (File file: basedir.listFiles()){
-            Song s = readSong(file.getPath());
+        for (String path: listAbcFiles("test_abc/header_order")){
+            Song s = readSong(path);
 
             assertEquals("Simple scale", s.getTitle());
             assertEquals(1, s.getIndex());
             assertEquals(120, s.getBeatsPerMinute());
-            assertEquals(1, s.getMeterNumerator());
+            assertEquals(4, s.getMeterNumerator());
             assertEquals(4, s.getMeterDenominator());
             assertEquals(new Duration(1,4), s.getDefaultDuration());
             assertEquals("Composer Name", s.getComposer());
+            assertEquals(new KeySignature(C, SingleAccidental.FLAT, false), s.getKeySignature());
         }
     }
 
@@ -69,7 +58,7 @@ public class SongParserTest {
         Song s = readSong("test_abc/header_valid_spaces.abc");
 
         //the title contains two invisible tab charactes
-        assertEquals("   	Simple	scale", s.getTitle());
+        assertEquals("	Simple	scale ", s.getTitle());
         assertEquals(1, s.getIndex());
         assertEquals(1200, s.getBeatsPerMinute());
         assertEquals(new Duration(1,42), s.getBeatDuration());
@@ -78,6 +67,7 @@ public class SongParserTest {
         assertEquals(new Duration(1,4), s.getDefaultDuration());
         //the title contains two invisible tab charactes
         assertEquals("   	Unknown   	", s.getComposer());
+        assertEquals(new KeySignature(C, SingleAccidental.NATURAL, true), s.getKeySignature());
     }
 
 
@@ -91,9 +81,8 @@ public class SongParserTest {
      */
     @Test
     public void testHeaderInvalidSpaces(){
-        File basedir = new File("test_abc/header_invalid_spaces");
-        for (File file: basedir.listFiles()){
-            shouldFailToParse(file.getPath());
+        for (String path: listAbcFiles("test_abc/header_invalid_spaces")){
+            shouldFailToParse(path);
         }
     }
 
@@ -104,9 +93,8 @@ public class SongParserTest {
      */
     @Test
     public void testHeaderMissingFields(){
-        File basedir = new File("test_abc/header_missing_fields");
-        for (File file: basedir.listFiles()){
-            shouldFailToParse(file.getPath());
+        for (String path: listAbcFiles("test_abc/header_missing_fields")){
+            shouldFailToParse(path);
         }
     }
 
@@ -563,9 +551,9 @@ public class SongParserTest {
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(2, bars.size());
         assertEquals(1, bars.get(0).getLyrics().size());
-        assertEquals(2, bars.get(1).getLyrics().size());
-        assertEquals("abc", bars.get(1).getLyrics().get(0).getText());
-        assertEquals("def", bars.get(1).getLyrics().get(1).getText());
+        assertEquals(1, bars.get(1).getLyrics().size());
+        assertEquals("abc", bars.get(0).getLyrics().get(0).getText());
+        assertEquals("def", bars.get(1).getLyrics().get(0).getText());
     }
 
 
@@ -673,13 +661,15 @@ public class SongParserTest {
     public void testBodyLyricsHyphenUnderscore(){
         Song s = readSong("test_abc/body_lyrics_hyphen_underscore.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(3, bars.size());
+        assertEquals(4, bars.size());
         assertEquals(1, bars.get(0).getLyrics().size());
         assertEquals("abc-", bars.get(0).getLyrics().get(0).getText());
         assertEquals(1, bars.get(1).getLyrics().size());
         assertEquals("", bars.get(1).getLyrics().get(0).getText());
         assertEquals(1, bars.get(2).getLyrics().size());
-        assertEquals("def", bars.get(2).getLyrics().get(0).getText());
+        assertEquals("", bars.get(2).getLyrics().get(0).getText());
+        assertEquals(1, bars.get(3).getLyrics().size());
+        assertEquals("def", bars.get(3).getLyrics().get(0).getText());
     }
 
 
@@ -748,9 +738,8 @@ public class SongParserTest {
      */
     @Test
     public void testBodyInvalidRepeat(){
-        File basedir = new File("test_abc/body_invalid_repeat");
-        for (File file: basedir.listFiles()){
-            shouldFailToParse(file.getPath());
+        for (String path: listAbcFiles("test_abc/body_invalid_repeat")){
+            shouldFailToParse(path);
         }
     }
 
@@ -767,9 +756,8 @@ public class SongParserTest {
      */
     @Test
     public void testBodyValidRepeat(){
-        File basedir = new File("test_abc/body_valid_repeat");
-        for (File file: basedir.listFiles()){
-            readSong(file.getPath());
+        for (String path: listAbcFiles("test_abc/body_valid_repeat")){
+            readSong(path);
         }
     }
 
@@ -782,7 +770,7 @@ public class SongParserTest {
      *
      */
     @Test
-    public void testBodySpaces(){
+    public void testBodyValidSpaces(){
         Song s = readSong("test_abc/body_valid_spaces.abc");
         List<Bar> bars = s.getBars(new Voice());
         assertEquals(2, bars.size());
@@ -809,5 +797,17 @@ public class SongParserTest {
             fail(e.toString());
         }
         return null;
+    }
+
+    private List<String> listAbcFiles(String basedirpath){
+        File basedir = new File(basedirpath);
+        List<String> output = new ArrayList<String>();
+        for (File file: basedir.listFiles()){
+            String path = file.getPath();
+            if (path.matches(".*\\.abc")){
+                output.add(path);
+            }
+        }
+        return output;
     }
 }

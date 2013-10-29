@@ -1,5 +1,4 @@
 package sound;
-
 import java.util.Map;
 import java.util.HashMap;
 
@@ -17,6 +16,9 @@ public class KeySignature {
 
     // mapping from letters to accidentals
     private final Map<Letter, Accidental> letterMap;
+    private final Letter letter;
+    private final SingleAccidental accidental;
+    private final boolean major;
 
     /**
      * Construct a KeySignature given a musical key.
@@ -30,6 +32,10 @@ public class KeySignature {
      * @param major true if the key is major. false if minor
      */
     public KeySignature(Letter letter, SingleAccidental accidental, boolean major){
+        this.letter = letter;
+        this.accidental = accidental;
+        this.major = major;
+
         // The number of flats in the key signature. If the number is negative,
         // then it's the number of sharps (since sharp is the opposite of flat). 
         // If the number of flats is greater than 7, then it loops around and starts
@@ -79,5 +85,34 @@ public class KeySignature {
      */
     public Accidental getAccidental(Letter letter){
         return letterMap.get(letter);
+    }
+
+
+    /**
+     * Two KeySignatures are equal if they were constructed
+     * with the same arguments.
+     *
+     * @return true if the other object is semantically equal.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null)
+            return false;
+        if (obj.getClass() != this.getClass())
+            return false;
+        KeySignature that = (KeySignature) obj;
+        return this.letter == that.letter &&
+            this.accidental == that.accidental &&
+            this.major == that.major;
+    }
+
+    /**
+     * Updated to match the new equals() function
+     */
+    @Override
+    public int hashCode() {
+        return this.letter.hashCode() +
+            this.accidental.hashCode() +
+            ((this.major) ? 1 : 0);
     }
 }
