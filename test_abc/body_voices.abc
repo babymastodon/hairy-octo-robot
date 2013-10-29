@@ -10,9 +10,9 @@ K:C
 V: upper
 A| 
 V:lower
-B |
+C |
 w: moo
 V:lower
-C :|
+D :|
 V: upper
-D|
+B|

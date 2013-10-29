@@ -43,12 +43,8 @@ package grammar;
 /*
  * These are the lexical rules. They define the tokens used by the lexer.
  */
-WHITESPACE : ('\t' | ' ')+ ;
-DIGIT: [0-9]+;
-BASENOTE : [a-gA-G]; //'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B' | 'c' | 'd' | 'e' | 'f' | 'g' | 'a' | 'b';
-REST : 'z';
-WORD: [h-yH-Z!.?']+;
-LINEFEED: (('\n')+ | ('\r\n')+);
+WHITESPACE : ('\t' | ' ')+;
+LINEFEED: ('\n' | '\r')+;
 
 /*
  * These are the parser rules. They define the structures used by the parser.
@@ -62,55 +58,102 @@ LINEFEED: (('\n')+ | ('\r\n')+);
  * http://www.antlr.org/wiki/display/ANTLR4/Parser+Rules#ParserRules-StartRulesandEOF
  */
 abctune : abcheader abcmusic EOF;
-abcheader : LINEFEED* fieldnumber LINEFEED* comment* LINEFEED* fieldtitle LINEFEED* otherfields* LINEFEED* fieldkey LINEFEED*;
-fieldnumber : 'X:' ' '* DIGIT ' '* endofline;
-fieldtitle : 'T:' ' '* fieldtitletext ' '* endofline;
-fieldtitletext : (' '+ | text | DIGIT | (space* DIGIT space*))+;
-otherfields : fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice | comment | LINEFEED;
-fieldcomposer : 'C:' ' '* composername ' '* endofline;
-composername: (' '+ | text)+;
-fielddefaultlength : 'L:' ' '* notelengthstrict ' '* endofline;
-fieldmeter : 'M:' ' '* meter ' '* endofline;
-fieldtempo : 'Q:' ' '* tempo ' '* endofline;
-fieldvoice : 'V:' text endofline;
-fieldkey : 'K:' ' '* key ' '* endofline;
-key : keynote (modeminor)*;
-keynote : BASENOTE (keyaccidental)*;
-keyaccidental : '#' | BASENOTE;
+
+//header
+abcheader : endofline? fieldnumber fieldtitle otherfields fieldkey;
+otherfields : (fieldcomposer | fielddefaultlength | fieldmeter | fieldtempo | fieldvoice)*;
+
+fieldnumber : 'X' ':' space? songnumber endofline;
+songnumber : number;
+
+fieldtitle : 'T' ':' title endofline;
+title: text;
+
+fieldcomposer : 'C' ':' composer endofline;
+composer : text;
+
+fielddefaultlength : 'L' ':' space? defaultlength endofline;
+defaultlength: number space? '/' space? number;
+
+fieldmeter : 'M' ':' space? meter endofline;
+meter : 'C' '|'? | (number space? '/' space? number);
+
+// spaces are permitted within the note length in the header
+
+fieldtempo : 'Q' ':' space? tempo endofline;
+tempo : number space? '/' space? number space? '=' space? number;
+
+fieldvoice : 'V' ':' voice endofline;
+voice : text;
+
+fieldkey : 'K' ':' space? key endofline;
+key : basenote keyaccidental? modeminor?;
+keyaccidental : '#' | 'b';
 modeminor : 'm';
-meter : BASENOTE | 'C|' | meterfraction;
-meterfraction : DIGIT+ '/' DIGIT+;
-tempo : meterfraction '=' DIGIT+;
+
+//body
 abcmusic : abcline*;
-abcline :  notesline (lyric LINEFEED*)* | midtunefield | comment | LINEFEED;
-notesline : element+ LINEFEED;
-//abcline : element+ LINEFEED | midtunefield | comment;
-element : noteelement | tupletelement | barline | ' ' ;
-noteelement : note | multinote;
-// note is either a pitch or a REST;
-note : noteorrest notelength?;
-noteorrest : pitch | REST;
-pitch : accidental* BASENOTE octave* ;
+abcline :  notesline | midtunefield;
+
+// line of notes
+notesline : element+ endofline lyric?;
+element : pitch | rest | multinote | tuplet | barline | space ;
+
+// pitch
+pitch : accidental? basenote octave? notelength?;
 octave : '\''+ | ','+;
-notelength : DIGIT* '/'? DIGIT*;
-notelengthstrict : DIGIT+ '/' DIGIT+;
-// '^' is sharp, '_' is flat, and '=' is neutral;
-accidental : '^' | '^^' | '_' | '__' | '=';
-//BASENOTE : 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B' | 'c' | 'd' | 'e' | 'f' | 'g' | 'a' | 'b';
-//REST : 'z';
-// tuplets;
-tupletelement : tupletspec noteelement+;
-tupletspec : '(' DIGIT ;
-// chords;
-multinote : '[' note+ ']';
-barline : '|' | '||' | '[|' | '|]' | ':|' | '|:' | '[1' | '[2';
+accidental : '^' | '^' '^' | '_' | '_' '_' | '=';
+
+// rest
+rest: 'z' notelength?;
+
+// chords only contain pitches
+multinote : '[' space? pitch (space | pitch)* ']' notelength?;
+
+notelength: notelengthfull | notelengthnumerator | notelengthdenominator | notelengthdefault;
+notelengthfull: number '/' number;
+notelengthnumerator: number '/'?;
+notelengthdenominator: '/' number;
+notelengthdefault: '/';
+
+// tuplets can contain pitches and chords, but not rests
+tuplet : duplet | triplet | quadruplet;
+duplet : '(' '2' space? tupletnote space? tupletnote;
+triplet: '(' '3' space? tupletnote space? tupletnote space? tupletnote;
+quadruplet: '(' '4' space? tupletnote space? tupletnote space? tupletnote space? tupletnote;
+tupletnote: pitch | multinote;
+
+barline : '[' '|' | '|' ']' | ':' '|' | '|' ':' | '[' '1' | '[' '2' | '|' '|' | '|';
+
 // A voice field might reappear in the middle of a piece;
 // to indicate the change of a voice;
 midtunefield : fieldvoice;
-comment : '%' text LINEFEED;
-endofline : comment | LINEFEED;
-lyric : 'w:' lyrical_element*;
-lyrical_element : ' '+ | '-' | '_' | '*' | '~' | '\-' | '|' | lyric_text | BASENOTE | REST;
-text : ' '* (WORD | BASENOTE | REST)+ ' '*;
-lyric_text : ' '* (WORD | BASENOTE | REST)+ ' '*;
+
+// lyrics always occur on a single line
+lyric : 'w:' (lyricunderscore | lyricstar | lyricbar | lyricword | space)* endofline;
+lyricunderscore : '_';
+lyricstar : '*';
+lyricbar : '|';
+lyricword : (character | number | punctuation)+;
+
+// Each line may be ended with a comment, and a comment may span multiple lines
+comment : '%' commenttext LINEFEED;
+endofline : space? (comment | LINEFEED) endofline?;
+commenttext : (~LINEFEED)*;
+text : (~(LINEFEED | '%'))*;
 space: WHITESPACE;
+
+// Lists of valid tokens (did not work when included in the Lexer
+// section, so they are here instead)
+basenote : 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B' | 'c' |
+           'd' | 'e' | 'f' | 'g' | 'a' | 'b';
+character: 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' |
+           'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' |
+           'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' |
+           'y' | 'z' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' |
+           'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' |
+           'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' |
+           'W' | 'X' | 'Y' | 'Z';
+punctuation: '"' | '\''| '?' | '!' | ',' | ';' | ':' | '.' | '(' | ')' | '-' | '\\' '-' | '~';
+digit: '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+number: digit+;

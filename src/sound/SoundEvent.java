@@ -21,6 +21,9 @@ public class SoundEvent {
      * @param duration the relative duration
      */
     public SoundEvent(Sound sound, Duration duration){
+        assert sound != null;
+        assert duration != null;
+
         this.sound = sound;
         this.duration = duration;
     }

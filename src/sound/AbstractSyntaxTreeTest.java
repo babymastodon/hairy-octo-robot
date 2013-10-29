@@ -188,4 +188,23 @@ public class AbstractSyntaxTreeTest {
         assertTrue(!b1.equals(b6));
     }
 
+
+    /**
+     * KeySignatures are equal if they were constructed
+     * with the same arguments.
+     */
+    @Test
+    public void testKeySignatureEquals(){
+        KeySignature k1 = new KeySignature(C, SingleAccidental.SHARP, false);
+        KeySignature k2 = new KeySignature(C, SingleAccidental.SHARP, false);
+        KeySignature k3 = new KeySignature(D, SingleAccidental.SHARP, false);
+        KeySignature k4 = new KeySignature(C, SingleAccidental.NATURAL, false);
+        KeySignature k5 = new KeySignature(C, SingleAccidental.SHARP, true);
+
+        assertTrue(k1.equals(k2));
+        assertTrue(!k1.equals(k3));
+        assertTrue(!k1.equals(k4));
+        assertTrue(!k1.equals(k5));
+    }
+
 }

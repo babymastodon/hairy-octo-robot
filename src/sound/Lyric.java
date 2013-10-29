@@ -28,6 +28,11 @@ public class Lyric {
         return text;
     }
 
+    @Override
+    public String toString(){
+        return "Lyric(" + getText() + ")";
+    }
+
     /**
      * Two lyrics are equal if they have the same text.
      *
