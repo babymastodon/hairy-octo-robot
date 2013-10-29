@@ -87,6 +87,9 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 	@Override public void enterOtherfields(ABCMusicParser.OtherfieldsContext ctx) { }
 	@Override public void exitOtherfields(ABCMusicParser.OtherfieldsContext ctx) { }
 
+	@Override public void enterNotelengthmultiply(ABCMusicParser.NotelengthmultiplyContext ctx) { }
+	@Override public void exitNotelengthmultiply(ABCMusicParser.NotelengthmultiplyContext ctx) { }
+
 	@Override public void enterVoice(ABCMusicParser.VoiceContext ctx) { }
 	@Override public void exitVoice(ABCMusicParser.VoiceContext ctx) { }
 
@@ -107,9 +110,6 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 
 	@Override public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) { }
 	@Override public void exitMidtunefield(ABCMusicParser.MidtunefieldContext ctx) { }
-
-	@Override public void enterNotelengthdefault(ABCMusicParser.NotelengthdefaultContext ctx) { }
-	@Override public void exitNotelengthdefault(ABCMusicParser.NotelengthdefaultContext ctx) { }
 
 	@Override public void enterCharacter(ABCMusicParser.CharacterContext ctx) { }
 	@Override public void exitCharacter(ABCMusicParser.CharacterContext ctx) { }
@@ -173,6 +173,9 @@ public class ABCMusicBaseListener implements ABCMusicListener {
 
 	@Override public void enterLyric(ABCMusicParser.LyricContext ctx) { }
 	@Override public void exitLyric(ABCMusicParser.LyricContext ctx) { }
+
+	@Override public void enterNotelengthhalf(ABCMusicParser.NotelengthhalfContext ctx) { }
+	@Override public void exitNotelengthhalf(ABCMusicParser.NotelengthhalfContext ctx) { }
 
 	@Override public void enterAbcheader(ABCMusicParser.AbcheaderContext ctx) { }
 	@Override public void exitAbcheader(ABCMusicParser.AbcheaderContext ctx) { }
