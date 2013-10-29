@@ -679,7 +679,7 @@ public class SongParserTest {
      */
     @Test
     public void testHeaderVoices(){
-        Song s = readSong("test_abc/header_voices.abc");
+        readSong("test_abc/header_voices.abc");
     }
 
 
@@ -792,7 +792,7 @@ public class SongParserTest {
         try {
             byte[] encoded = Files.readAllBytes(Paths.get(path));
             String contents = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(encoded)).toString();
-            return new SongParser(contents).getSong();
+            return new SongParser(contents).getResult();
         } catch (IOException e) {
             fail(e.toString());
         }

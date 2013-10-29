@@ -33,7 +33,7 @@ public class SongParser {
      *
      * @return a Song object containing the parsed data.
      */
-    public Song getSong(){
+    public Song getResult(){
         return song;
     }
 
