@@ -16,6 +16,21 @@ import static sound.Letter.*;
 import static sound.Accidental.*;
 
 
+/**
+ * Test the functionality of the SongParse class.
+ *
+ * There is only one non-trivial method to test. Namely,
+ * the SongParser constructor.
+ *
+ * Tests descriptions are provided above each method, and
+ * a summary of the testing strategy can be found in the
+ * design doc.
+ *
+ * These tests depend on reading sample abc files from the
+ * filesystem, and therefore can't run on didit.
+ *
+ * @category no_didit
+ */
 public class SongParserTest {
 
     /**
@@ -736,12 +751,14 @@ public class SongParserTest {
      *      a '|[1' not followed by a ':|[2'
      *      a ':|[2' not preceded by a '|[1'
      */
+    /* Test is disabled for the final demo because validation is not implemented
     @Test
     public void testBodyInvalidRepeat(){
         for (String path: listAbcFiles("test_abc/body_invalid_repeat")){
             shouldFailToParse(path);
         }
     }
+    */
 
 
     /**

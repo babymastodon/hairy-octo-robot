@@ -7,6 +7,24 @@ import static org.junit.Assert.*;
 import static sound.Letter.*;
 import static sound.Accidental.*;
 
+/**
+ * Tests the constructors and equality operators
+ * for the following immutable classes:
+ *
+ *      Bar
+ *      Duration
+ *      KeySignature
+ *      Lyric
+ *      Pitch
+ *      Song
+ *      Sound
+ *      SoundEvent
+ *      Voice
+ *
+ * Most other methods of these classes
+ * are trivial setters and getters, so they were
+ * left untested.
+ */
 public class AbstractSyntaxTreeTest {
 
     /**
@@ -205,6 +223,20 @@ public class AbstractSyntaxTreeTest {
         assertTrue(!k1.equals(k3));
         assertTrue(!k1.equals(k4));
         assertTrue(!k1.equals(k5));
+    }
+
+
+    /**
+     * Voices are equal if they were constructed with the same string.
+     */
+    @Test
+    public void testVoiceEquals(){
+        Voice v1 = new Voice("voice1");
+        Voice v2 = new Voice("voice1");
+        Voice v3 = new Voice();
+
+        assertTrue(v1.equals(v2));
+        assertTrue(!v1.equals(v3));
     }
 
 }

@@ -8,9 +8,11 @@ import junit.framework.TestCase;
 import org.junit.Test;
 
 /**
+ * The three warmup exercises played directly
+ * using the SequencePlayer.
+ *
  * @category no_didit
  */
-
 public class SequencePlayerTest extends TestCase {
 	@Test
 	public void testPieceOne() {

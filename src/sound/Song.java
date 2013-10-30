@@ -197,7 +197,12 @@ public class Song {
     }
     
     
-    
+    /**
+     * Two Songs are equal if they were constructed with
+     * equal arguments.
+     *
+     * @return whether the given song/object is equal to this.
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null){
@@ -222,8 +227,11 @@ public class Song {
     }
 
 
-    
-    
+    /**
+     * Updated to reflect the new implementation of equals().
+     *
+     * @return an integer hashcode
+     */
     @Override
     public int hashCode() {
         return (index + composer.hashCode() + meterNumerator + meterDenominator

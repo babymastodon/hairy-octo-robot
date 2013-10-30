@@ -64,10 +64,10 @@ public class Sound {
     }
 
     /**
-     * Two pitches are semantically equal if they contain the
+     * Two sounds are semantically equal if they contain the
      * same pitches.
      *
-     * @return an unmodifiable list of pitches.
+     * @return whether the pitches are equal.
      */
     @Override
     public boolean equals(Object obj) {
