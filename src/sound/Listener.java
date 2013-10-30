@@ -10,6 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
+/**
+ * Creates a Song object when it walks through a parsed
+ * Antlr tree of an ABC file.
+ */
 public class Listener extends ABCMusicBaseListener {
 	//Song Params
 	private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>(); //barLists map
