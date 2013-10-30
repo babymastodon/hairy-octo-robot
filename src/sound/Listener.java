@@ -34,7 +34,7 @@ public class Listener extends ABCMusicBaseListener {
 	private Set<Integer> curLyricBarSplits; // list of indices of lyrics that should start on new bars
 	private ArrayList<SoundEvent> currentNoteList = new ArrayList<SoundEvent>(); //Store sounds for current bar in
 	private boolean inMultinote = false;
-	private ArrayList<Pitch> multinoteList;
+	private ArrayList<Pitch> multinoteList; //pitches of current multinote
 	private Duration multinoteDuration;
 	private boolean inTuplet = false;
 	private Duration tupletMultiplier; //duration to alter tuplet note durations
@@ -42,7 +42,12 @@ public class Listener extends ABCMusicBaseListener {
 	//Bar booleans
 	Boolean endRepeat, endSection; //suffixes
 	Boolean firstEnding, secondEnding, beginRepeat, beginSection; //prefixes
-
+	
+	@Override
+	public void enterAbctune(ABCMusicParser.AbctuneContext ctx){
+		resetBarBooleans(); //set them to false
+	}
+	
 	@Override
 	public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) {
 		if (barList.isEmpty()==false){ //assign barList if we have one before we get new voice
@@ -126,8 +131,14 @@ public class Listener extends ABCMusicBaseListener {
 		int denominator = 2;
 		lastDuration = new Duration(numerator, denominator);
 	}
-
+	
+	/** 
+	 * Returns last visited duration & resets lastDuration
+	 * 
+	 * @return last visited duration
+	 */
 	private Duration getLastDuration(){
+		//return 
 		Duration output = lastDuration;
 		lastDuration = new Duration(1,1);
 		return output;
@@ -175,19 +186,20 @@ public class Listener extends ABCMusicBaseListener {
 		if (inTuplet){
 			duration = duration.mul(tupletMultiplier);
 		}
-		if (inMultinote){
+		if (inMultinote){ //if in multinote, add pitch to multinote list
 			if (multinoteList.size()==0){
 				multinoteDuration = duration;
 			}
 			multinoteList.add(pitch);
 		}
-		else{
+		else{ //otherwise, add pitch to working note list.
 			Sound sound = new Sound(pitch);
 			SoundEvent note = new SoundEvent(sound,duration);
 			currentNoteList.add(note);
 		}
 	}
-
+	
+	@Override
 	public void exitRest(ABCMusicParser.RestContext ctx) {
 		Duration duration = getLastDuration();
 		if (inTuplet){
@@ -366,22 +378,26 @@ public class Listener extends ABCMusicBaseListener {
 		// END_REPEAT, END_SECTION, NONE; suffix
 		// FIRST_ENDING, SECOND_ENDING, BEGIN_REPEAT, BEGIN_SECTION, NONE; prefix
 		switch (barString){
+		//bar endings:
 		case ":|":
 			endRepeat = true;
 		case "||":
 		case "|]":
 			endSection = true;
 		case "|":
+			
 			Bar bar  = new Bar(currentNoteList, new ArrayList<Lyric>(), getPrefix(),getSuffix());
 			curBarList.add(bar);
-			currentNoteList = new ArrayList<SoundEvent>();
+			currentNoteList = new ArrayList<SoundEvent>(); 
 			resetBarBooleans();
 			break;
+		//bar beginnings:
 		case "[|":
 			beginSection = true;
 			break;
 		case "|:":
 			if(currentNoteList.size()!=0){
+				//if |: isn't at the beginning of a section, (has notes before it), add them to a bar
 				Bar bar2  = new Bar(currentNoteList, new ArrayList<Lyric>(), getPrefix(),getSuffix());
 				curBarList.add(bar2);
 				currentNoteList = new ArrayList<SoundEvent>();
@@ -398,19 +414,31 @@ public class Listener extends ABCMusicBaseListener {
 		}
 	}
 
-	public BarSuffix getSuffix(){
+	/**
+     * Returns BarSuffix based on 
+     * Boolean endRepeat, endSection
+     * @return BarSuffix
+     */
+	private BarSuffix getSuffix(){
 		if(endRepeat){return BarSuffix.END_REPEAT;}
 		else if(endSection){return BarSuffix.END_SECTION;}
 		return BarSuffix.NONE;
 	}
-	public BarPrefix getPrefix(){
+	
+	/**
+     * Returns BarSuffix based on 
+     * Boolean firstEnding, secondEnding, beginRepeat, beginSection
+     * @return BarPrefix
+     */
+	private BarPrefix getPrefix(){
 		if(firstEnding){return BarPrefix.FIRST_ENDING;}
 		else if(secondEnding){return BarPrefix.SECOND_ENDING;}
 		else if(beginRepeat){return BarPrefix.BEGIN_REPEAT;}
 		else if(beginSection){return BarPrefix.BEGIN_SECTION;}
 		return BarPrefix.NONE;
 	}
-	public void resetBarBooleans(){
+	
+	private void resetBarBooleans(){//Used at the start of new bars
 		//suffixes
 		endRepeat = false;
 		endSection = false; 
@@ -426,10 +454,11 @@ public class Listener extends ABCMusicBaseListener {
 	public void enterKey(ABCMusicParser.KeyContext ctx) {
 		Letter letter = Letter.fromChar(
 				ctx.basenote().getText().charAt(0));
-		SingleAccidental accidental = SingleAccidental.NATURAL;
-		boolean major = true;
+		SingleAccidental accidental = SingleAccidental.NATURAL; //Default accidental
+		boolean major = true; //default
 		// Accidental : SHARP(1), FLAT(-1), NATURAL(0)
-		if (ctx.keyaccidental() != null) {
+		if (ctx.keyaccidental() != null) { 
+			//determine key accidental
 			if (ctx.keyaccidental().getText().equals("b")) {
 				accidental = SingleAccidental.FLAT;
 			} else {
@@ -437,6 +466,7 @@ public class Listener extends ABCMusicBaseListener {
 			}
 		}
 		if (ctx.modeminor() != null){
+			//see if in minor
 			if (ctx.modeminor().getText().equals("m")) {
 				major = false;
 			}
@@ -452,11 +482,6 @@ public class Listener extends ABCMusicBaseListener {
 		int denominator = Integer.parseInt(
 				ctx.number().get(1).getText());
 		defaultDuration = new Duration(numerator, denominator);
-	}
-
-	@Override
-	public void enterAbctune(ABCMusicParser.AbctuneContext ctx){
-		resetBarBooleans(); //set them to false
 	}
 
 	@Override 
@@ -490,6 +515,11 @@ public class Listener extends ABCMusicBaseListener {
 				defaultDuration, keySignature, beatDuration, beatsPerMinute);
 	}
 
+	/**
+	 * returns Song object
+	 * 
+	 * @return song
+	 */
 	public Song getSong(){
 		return song;
 	}
