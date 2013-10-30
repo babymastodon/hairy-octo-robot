@@ -12,6 +12,17 @@ import static org.junit.Assert.*;
 import static sound.Letter.*;
 import static sound.Accidental.*;
 
+
+/**
+ * Test the functionality of the SongConverter class.
+ *
+ * There is only one non-trivial method to test. Namely,
+ * the SongConverter constructor.
+ *
+ * Tests descriptions are provided above each method, and
+ * a summary of the testing strategy can be found in the
+ * design doc.
+ */
 public class SongConverterTest {
 
     /**

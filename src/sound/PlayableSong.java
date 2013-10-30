@@ -103,7 +103,12 @@ public class PlayableSong {
     }
     
     
-    
+    /**
+     * Two PlayableSongs are equal if they were constructed with
+     * equal arguments.
+     *
+     * @return whether the given PlayableSong/object is equal to this.
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == null){
@@ -123,6 +128,11 @@ public class PlayableSong {
 
     
     
+    /**
+     * Updated to reflect the new implementation of equals().
+     *
+     * @return an integer hashcode
+     */
     @Override
     public int hashCode() {
         return (ticksPerBeat + beatsPerMinute + voiceToEvents.hashCode());
