@@ -235,8 +235,8 @@ public class AbstractSyntaxTreeTest {
         Voice v2 = new Voice("voice1");
         Voice v3 = new Voice();
 
-        assertTrue(k1.equals(k2));
-        assertTrue(!k1.equals(k3));
+        assertTrue(v1.equals(v2));
+        assertTrue(!v1.equals(v3));
     }
 
 }
