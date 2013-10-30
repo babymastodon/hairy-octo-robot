@@ -427,9 +427,9 @@ public class SongParserTest {
     public void testBodySimpleRepeat(){
         Song s = readSong("test_abc/body_repeat_simple.abc");
         List<Bar> bars = s.getBars(new Voice());
-        assertEquals(1, bars.size());
-        assertEquals(BarPrefix.BEGIN_REPEAT, bars.get(0).getPrefix());
-        assertEquals(BarSuffix.END_REPEAT, bars.get(0).getSuffix());
+        assertEquals(2, bars.size());
+        assertEquals(BarPrefix.BEGIN_REPEAT, bars.get(1).getPrefix());
+        assertEquals(BarSuffix.END_REPEAT, bars.get(1).getSuffix());
     }
 
 
