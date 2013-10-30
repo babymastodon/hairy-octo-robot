@@ -11,11 +11,14 @@ import java.util.Set;
 import java.util.HashSet;
 
 /**
- * Creates a Song object when it walks through a parsed
- * Antlr tree of an ABC file.
+ * Creates a Song object when by walking through the
+ * Antlr parse tree of an ABC file.
  */
 public class Listener extends ABCMusicBaseListener {
-    //Song Params
+
+    // Song Params are filled in by the Listener as it walks through
+    // the parse tree. They are used to construct the Song
+    // object when the walking is complete.
     private Map<Voice, List<Bar>> barMap = new HashMap<Voice, List<Bar>>(); //barLists map
     private Song song;
     private int index; // req of abc files
@@ -24,13 +27,14 @@ public class Listener extends ABCMusicBaseListener {
     private int meterNumerator = 4; // default 4
     private int meterDenominator = 4; // default 4
     private Duration defaultDuration;   // (L) meter<0.75 default note length is
-    // sixteenth note
-    // meter>=.75, it is an eighth note
+                                        // sixteenth note
+                                        // meter>=.75, it is an eighth note
     private KeySignature keySignature; // req of abc files
     private Duration beatDuration; // (L): defaultDuration unless specified
     private int beatsPerMinute = 100; // default 100
 
-    //Things to keep track of:
+    // Things to keep track of while
+    // walking the parse tree.
     private Voice currentVoice = new Voice(); //keeps track of applicable voice -- set up with default voice
     private List<Bar> barList = new ArrayList<Bar>(); //current list of bars
     private List<Bar> curBarList; // list of bars on the current line
@@ -47,11 +51,19 @@ public class Listener extends ABCMusicBaseListener {
     Boolean endRepeat, endSection; //suffixes
     Boolean firstEnding, secondEnding, beginRepeat, beginSection; //prefixes
 
+    /**
+     * Initialize the Bar booleans when entering
+     * the first node of the parse tree.
+     */
     @Override
     public void enterAbctune(ABCMusicParser.AbctuneContext ctx){
-        resetBarBooleans(); //set them to false
+        resetBarBooleans();
     }
 
+    /**
+     * Change the current voice when a "V: ---" directive is
+     * encountered in the body of the ABC file.
+     */
     @Override
     public void enterMidtunefield(ABCMusicParser.MidtunefieldContext ctx) {
         if (barList.isEmpty()==false){ //assign barList if we have one before we get new voice
@@ -68,18 +80,29 @@ public class Listener extends ABCMusicBaseListener {
         barList = new ArrayList<Bar>(); //get rid of old bars
     }
 
+
+    /**
+     * Save the name of the composer with no further modification.
+     */
     @Override
     public void enterComposer(ABCMusicParser.ComposerContext ctx) {
         composer = ctx.text().getText();
     }
 
 
+    /**
+     * Save the numerator and denominator of the meter,
+     * using the default of "4/4" for common time and
+     * "2/2" for cut time.
+     */
     @Override
     public void enterMeter(ABCMusicParser.MeterContext ctx) {
         if (ctx.number().isEmpty()){
             if (ctx.getText().equals("C")){
+                // common time
                 meterNumerator = meterDenominator = 4;
             } else {
+                // cut time
                 meterNumerator = meterDenominator = 2;
             }
         } else {
@@ -90,6 +113,11 @@ public class Listener extends ABCMusicBaseListener {
         }
     }
 
+
+    /**
+     * Parse beatsPerMinute, and beatDuration, which specify
+     * the song tempo.
+     */
     @Override
     public void enterTempo(ABCMusicParser.TempoContext ctx) {
         beatsPerMinute = Integer.parseInt(ctx.number().get(2).getText());
@@ -101,6 +129,11 @@ public class Listener extends ABCMusicBaseListener {
                 beatDurationDenominator);
     }
 
+
+    /**
+     * Parse the length of a note of the form "n/m", and convert
+     * it to a Duration.
+     */
     @Override
     public void enterNotelengthfull(ABCMusicParser.NotelengthfullContext ctx) {
         int numerator = Integer.parseInt(ctx.number().get(0).getText());
@@ -108,6 +141,10 @@ public class Listener extends ABCMusicBaseListener {
         lastDuration = new Duration(numerator, denominator);
     }
 
+    /**
+     * Parse the length of a note of the form "n", and convert
+     * it to a Duration with a denominator of 1.
+     */
     @Override
     public void enterNotelengthmultiply(ABCMusicParser.NotelengthmultiplyContext ctx) {
         int numerator = Integer.parseInt(ctx.number().getText());
@@ -115,6 +152,11 @@ public class Listener extends ABCMusicBaseListener {
         lastDuration = new Duration(numerator, denominator);
     }
 
+
+    /**
+     * Parse the length of a note of the form "n/", and convert
+     * it to a Duration with a denominator of 2.
+     */
     @Override
     public void enterNotelengthnumerator(ABCMusicParser.NotelengthnumeratorContext ctx) {
         int numerator = Integer.parseInt(ctx.number().getText());
@@ -122,6 +164,11 @@ public class Listener extends ABCMusicBaseListener {
         lastDuration = new Duration(numerator, denominator);
     }
 
+
+    /**
+     * Parse the length of a note of the form "/m", and convert
+     * it to a Duration with a numerator of 1.
+     */
     @Override
     public void enterNotelengthdenominator(ABCMusicParser.NotelengthdenominatorContext ctx) {
         int numerator = 1;
@@ -129,6 +176,12 @@ public class Listener extends ABCMusicBaseListener {
         lastDuration = new Duration(numerator, denominator);
     }
 
+
+    /**
+     * Parse the length of a note of the form "/", and convert
+     * it to a Duration with a numerator of 1 and a denominator
+     * of 2.
+     */
     @Override
     public void enterNotelengthhalf(ABCMusicParser.NotelengthhalfContext ctx) {
         int numerator = 1;
@@ -137,7 +190,12 @@ public class Listener extends ABCMusicBaseListener {
     }
 
     /** 
-     * Returns last visited duration & resets lastDuration
+     * Returns the duration of the current note, and reset
+     * the Duration to the default value.
+     *
+     * Should only be called after one of the "engerNotelength*"
+     * functions has executed, or else the default value is always
+     * returned.
      * 
      * @return last visited duration
      */
@@ -148,15 +206,32 @@ public class Listener extends ABCMusicBaseListener {
         return output;
     }
 
+    
+    /**
+     * Construct a SoundEvent object consisting of an optional
+     * accidental, a base note, an optional octave, and
+     * an optional duration.
+     *
+     * This function has different behavior depending on the
+     * context in which it executes.
+     *
+     *      1) Normally, create the SoundEvent and append it to 
+     *         the currentNoteList
+     *      2) If inside a tuple, multiply the duration
+     *         with the appropriate multiplier
+     *      3) If inside a chord, add a Pitch to the multinoteList
+     *         and set the multinoteDuration appropriately
+     */
     @Override
     public void exitPitch(ABCMusicParser.PitchContext ctx) {
+        // Get the note duration
         Duration duration = getLastDuration();
+
+        // Get the base note
         char noteChar = ctx.basenote().getText().charAt(0);
-        int octave = 0;
-        if(Character.isLowerCase(noteChar)){
-            octave += 1;
-        }
         Letter letter = Letter.fromChar(noteChar);
+
+        // Calculate the accidental
         Accidental accidental = Accidental.NONE;;
         if (ctx.accidental() != null){
             String accidentalString = ctx.accidental().getText();
@@ -178,6 +253,12 @@ public class Listener extends ABCMusicBaseListener {
                     break;
             }
         }
+
+        // Calculate the octave
+        int octave = 0;
+        if(Character.isLowerCase(noteChar)){
+            octave += 1;
+        }
         if (ctx.octave() != null){
             String octaveString = ctx.octave().getText();
             if (octaveString.charAt(0) == '\''){
@@ -186,23 +267,35 @@ public class Listener extends ABCMusicBaseListener {
                 octave -= octaveString.length();
             }
         }
+
+        // Construct the pitch object
         Pitch pitch = new Pitch(letter,accidental,octave);
+
         if (inTuplet){
+            // If tuple, multiply the duration appropriately
             duration = duration.mul(tupletMultiplier);
         }
-        if (inMultinote){ //if in multinote, add pitch to multinote list
+        if (inMultinote){
+            // if in a chord, add pitch to multinote list
             if (multinoteList.size()==0){
+                // save the duration if this is the first note in the chord
                 multinoteDuration = duration;
             }
             multinoteList.add(pitch);
         }
-        else{ //otherwise, add pitch to working note list.
+        else{
+            // otherwise, add pitch to the currentNoteList
             Sound sound = new Sound(pitch);
             SoundEvent note = new SoundEvent(sound,duration);
             currentNoteList.add(note);
         }
     }
 
+
+    /**
+     * Construct a rest with the appropriate duration
+     * and add it to the currentNoteList.
+     */
     @Override
     public void exitRest(ABCMusicParser.RestContext ctx) {
         Duration duration = getLastDuration();
@@ -214,54 +307,97 @@ public class Listener extends ABCMusicBaseListener {
         currentNoteList.add(rest);
     }
 
+
+    /**
+     * Before entering the chord pattern, reset the multiNoteList,
+     * and set the inMultinote flag so that the exitPitch function
+     * knows that the next set of notes belongs to the chord.
+     */
     @Override
     public void enterMultinote(ABCMusicParser.MultinoteContext ctx) {
         inMultinote = true;
         multinoteList = new ArrayList<Pitch>();
     }
 
+
+    /**
+     * Construct the chord object with the Pitches in multinoteList.
+     */
     @Override
     public void exitMultinote(ABCMusicParser.MultinoteContext ctx) {
         inMultinote = false;
         Sound sound = new Sound(multinoteList);
+
+        // Duration = chord duration * duration of first note in chord
         SoundEvent chord = new SoundEvent(sound,multinoteDuration.mul(getLastDuration()));
         currentNoteList.add(chord);
     }
 
+
+    /**
+     * When entering a duplet, set the duration multiplier to 3/2 --
+     * duplet notes are 3/2 times longer than their normal duration.
+     */
     @Override
     public void enterDuplet(ABCMusicParser.DupletContext ctx) {
         inTuplet = true;
         tupletMultiplier = new Duration(3,2);
     }
 
+
+    /**
+     * Triplet notes are 2/3 their normal durations.
+     */
     @Override
     public void enterTriplet(ABCMusicParser.TripletContext ctx) {
         inTuplet = true;
         tupletMultiplier = new Duration(2,3);
     }
 
+
+    /**
+     * Quadruplet ntoes are 3/4 their normal durations.
+     */
     @Override
     public void enterQuadruplet(ABCMusicParser.QuadrupletContext ctx) {
         inTuplet = true;
         tupletMultiplier = new Duration(3,4);
     }
 
+
+    /**
+     * Reset the inTuplet flag to disable the tuple multiplier.
+     */
     @Override
     public void exitTuplet(ABCMusicParser.TupletContext ctx) {
         inTuplet = false;
     }
 
 
+    /**
+     * Save the song title without any modifications.
+     */
     @Override
     public void enterTitle(ABCMusicParser.TitleContext ctx) {
         title = ctx.text().getText();
     }
 
+
+    /**
+     * Save the song number as an integer.
+     */
     @Override
     public void enterSongnumber(ABCMusicParser.SongnumberContext ctx) {
         index = Integer.parseInt(ctx.getText());
     }
 
+
+    /**
+     * When reading a new line of notes, reset the given lists.
+     *
+     * These lists are used in the exitNotesline function for matching
+     * up lyrics with the appropriate bars.
+     */
     @Override
     public void enterNotesline(ABCMusicParser.NoteslineContext ctx) {
         curBarList = new ArrayList<Bar>();
@@ -269,6 +405,12 @@ public class Listener extends ABCMusicBaseListener {
         curLyricBarSplits = new HashSet<Integer>();
     }
 
+    /**
+     * After reading a line of notes/bars, and the optional lyrics that
+     * belong to that line, match the lyrics up with the appropriate
+     * bars, and then append the completed bars to the appropriate
+     * list in barMap depending on the current voice.
+     */
     @Override
     public void exitNotesline(ABCMusicParser.NoteslineContext ctx) {
         // index into curBarList
@@ -332,6 +474,11 @@ public class Listener extends ABCMusicBaseListener {
         }
     }
 
+
+    /**
+     * Parse a lyrics word, and perform the necessary transformations
+     * to convert it into a list of Lyric objects.
+     */
     @Override
     public void enterLyricword(ABCMusicParser.LyricwordContext ctx) {
         // split apart the syllables
@@ -358,31 +505,49 @@ public class Listener extends ABCMusicBaseListener {
         }
     }
 
+
+    /**
+     * A single "*" in the lyrics gets transformed to a blank Lyric object.
+     */
     @Override
     public void enterLyricstar(ABCMusicParser.LyricstarContext ctx) {
         // Star translates to an empty Lyric
         curLyricList.add(new Lyric(""));
     }
 
+
+    /**
+     * A single "_" in the lyrics gets transformed to a blank Lyric object.
+     */
     @Override
     public void enterLyricunderscore(ABCMusicParser.LyricunderscoreContext ctx) {
         // Underscore translates to an empty Lyric
         curLyricList.add(new Lyric(""));
     }
 
+
+    /**
+     * A single "_" in the lyrics gets transformed to a blank Lyric object.
+     */
     @Override
     public void enterLyricbar(ABCMusicParser.LyricbarContext ctx) {
         // mark that the current lyric should start on a new bar
         curLyricBarSplits.add(curLyricList.size());
     }
 
+
+    /**
+     * When a bar token is encountered, perform the appropriate action
+     * which may include:
+     *      
+     *      1) Creating a new Bar object with the current list of notes.
+     *      2) Setting the appropriate flags for song sections and repititions.
+     */
     @Override
     public void enterBarline(ABCMusicParser.BarlineContext ctx) {
         String barString = ctx.getText();
-        // END_REPEAT, END_SECTION, NONE; suffix
-        // FIRST_ENDING, SECOND_ENDING, BEGIN_REPEAT, BEGIN_SECTION, NONE; prefix
         switch (barString){
-            //bar endings:
+            // bar endings -- create new bar with the current list of notes
             case ":|":
                    endRepeat = true;
             case "||":
@@ -395,13 +560,15 @@ public class Listener extends ABCMusicBaseListener {
                    currentNoteList = new ArrayList<SoundEvent>(); 
                    resetBarBooleans();
                    break;
-                   //bar beginnings:
+
+           // bar beginnings -- set the appropriate flags
             case "[|":
                    beginSection = true;
                    break;
             case "|:":
+                    // NOTE: in certain cases, '|:' serves as a bar ending as well as a beginning
                     if(currentNoteList.size()!=0){
-                        //if |: isn't at the beginning of a section, (has notes before it), add them to a bar
+                        // if |: isn't at the beginning of a section, (has notes before it), add them to a bar
                         Bar bar2  = new Bar(currentNoteList, new ArrayList<Lyric>(), getPrefix(),getSuffix());
                         curBarList.add(bar2);
                         currentNoteList = new ArrayList<SoundEvent>();
@@ -418,9 +585,10 @@ public class Listener extends ABCMusicBaseListener {
         }
     }
 
+
     /**
-     * Returns BarSuffix based on 
-     * Boolean endRepeat, endSection
+     * Convert the endRepeat and endSection booleans into the 
+     * appropriate BarSuffix enum.
      * @return BarSuffix
      */
     private BarSuffix getSuffix(){
@@ -429,9 +597,10 @@ public class Listener extends ABCMusicBaseListener {
         return BarSuffix.NONE;
     }
 
+
     /**
-     * Returns BarSuffix based on 
-     * Boolean firstEnding, secondEnding, beginRepeat, beginSection
+     * Convert the firstEnding, secondEnding, beginRepeat and beginSection
+     * booleans into the appropriate BarPrefix enum.
      * @return BarPrefix
      */
     private BarPrefix getPrefix(){
@@ -442,7 +611,12 @@ public class Listener extends ABCMusicBaseListener {
         return BarPrefix.NONE;
     }
 
-    private void resetBarBooleans(){//Used at the start of new bars
+
+    /**
+     * At the start of each new bar, the bar booleans
+     * need to be set to false.
+     */
+    private void resetBarBooleans(){
         //suffixes
         endRepeat = false;
         endSection = false; 
@@ -454,6 +628,9 @@ public class Listener extends ABCMusicBaseListener {
     }
 
 
+    /**
+     * Parse the key header, and create a KeySignature object.
+     */
     @Override
     public void enterKey(ABCMusicParser.KeyContext ctx) {
         Letter letter = Letter.fromChar(
@@ -479,6 +656,9 @@ public class Listener extends ABCMusicBaseListener {
     }
 
 
+    /**
+     * Parse the default note length header, and create a Duration object.
+     */
     @Override
     public void enterDefaultlength(ABCMusicParser.DefaultlengthContext ctx) {
         int numerator = Integer.parseInt(
@@ -488,6 +668,12 @@ public class Listener extends ABCMusicBaseListener {
         defaultDuration = new Duration(numerator, denominator);
     }
 
+
+    /**
+     * When finished walking the parse tree, use the Song parameters
+     * (which were collected while walking the tree) to construct a
+     * new Song object.
+     */
     @Override 
     public void exitAbctune(ABCMusicParser.AbctuneContext ctx) {
         if (barList.isEmpty()==false){ //assign barList if we have one
@@ -520,7 +706,8 @@ public class Listener extends ABCMusicBaseListener {
     }
 
     /**
-     * returns Song object
+     * Return the completed song object generated
+     * from the ABC file.
      * 
      * @return song
      */
